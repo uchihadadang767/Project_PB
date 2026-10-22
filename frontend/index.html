@@ -627,10 +627,10 @@
         <!-- Viewfinder Viewport -->
         <div class="relative w-full mx-auto aspect-[4/5] max-h-[65vh] bg-primary-container overflow-hidden border-2 border-primary shadow-brutal-lg select-none flex items-center justify-center">
           <!-- Real Webcam Video Element (Normal Color, Clean) -->
-          <video id="camera-video" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
+          <video id="camera-video" class="absolute inset-0 w-full h-full object-cover camera-flipped" autoplay playsinline muted></video>
 
           <!-- Fallback Simulated Canvas -->
-          <canvas id="camera-sim-canvas" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
+          <canvas id="camera-sim-canvas" class="absolute inset-0 w-full h-full object-cover camera-flipped hidden"></canvas>
 
           <!-- Framing Corners -->
           <div class="absolute top-4 left-4 w-8 h-8 pointer-events-none flex flex-col justify-between">
@@ -665,8 +665,13 @@
               <span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
               <span>LIVE CAM</span>
             </div>
-            <div class="bg-surface-container-lowest/90 text-primary font-label-sm px-2 py-0.5 font-bold border border-primary">
-              NATURAL COLOR
+            <div class="flex items-center gap-1.5">
+              <span id="camera-orientation-badge" class="bg-surface-container-lowest/90 text-primary font-label-sm px-2 py-0.5 font-bold border border-primary">
+                MIRROR: ON
+              </span>
+              <span class="bg-surface-container-lowest/90 text-primary font-label-sm px-2 py-0.5 font-bold border border-primary">
+                NATURAL COLOR
+              </span>
             </div>
           </div>
 
@@ -693,9 +698,14 @@
         <!-- Controls Tray -->
         <div class="w-full bg-surface-container-low p-4 shadow-brutal border-2 border-primary flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3">
-            <button id="btn-flash" class="h-14 px-4 bg-surface-container text-on-surface hover:bg-surface-container-high border border-primary btn-press flex items-center gap-2 font-label-md text-label-md uppercase cursor-pointer" type="button">
+            <button id="btn-flash" class="h-14 px-4 bg-surface-container text-on-surface hover:bg-surface-container-high border border-primary btn-press flex items-center gap-2 font-label-md text-label-md uppercase cursor-pointer" type="button" title="Toggle Camera Flash">
               <span id="flash-icon" class="material-symbols-outlined text-[20px] text-secondary-container">flash_on</span>
               <span id="flash-state" class="font-label-sm text-label-sm text-primary font-bold">FLASH ON</span>
+            </button>
+
+            <button id="btn-mirror" class="h-14 px-4 bg-surface-container text-on-surface hover:bg-surface-container-high border border-primary btn-press flex items-center gap-2 font-label-md text-label-md uppercase cursor-pointer" type="button" title="Toggle Mirror / Flip Orientation">
+              <span id="mirror-icon" class="material-symbols-outlined text-[20px] text-secondary-container">flip</span>
+              <span id="mirror-state" class="font-label-sm text-label-sm text-primary font-bold">MIRROR: ON</span>
             </button>
           </div>
 

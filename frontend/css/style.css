@@ -202,6 +202,11 @@ body {
   opacity: 1;
 }
 
+/* Camera Mirror / Flip */
+.camera-flipped {
+  transform: scaleX(-1) !important;
+}
+
 /* Custom modal backdrop */
 .modal-backdrop {
   background-color: rgba(18, 18, 18, 0.75);

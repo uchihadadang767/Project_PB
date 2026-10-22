@@ -193,6 +193,11 @@ class KioskApp {
           if (shutterBtn && !window.kioskCamera.isCapturing) {
             shutterBtn.click();
           }
+        } else if (e.key === 'm' || e.key === 'M') {
+          const mirrorBtn = document.getElementById('btn-mirror');
+          if (mirrorBtn) {
+            mirrorBtn.click();
+          }
         }
       }
     });
@@ -322,6 +327,14 @@ class KioskApp {
           icon.className = 'material-symbols-outlined text-[20px] text-outline';
           stateText.textContent = 'FLASH DISABLED';
         }
+      });
+    }
+
+    const mirrorBtn = document.getElementById('btn-mirror');
+    if (mirrorBtn) {
+      mirrorBtn.addEventListener('click', () => {
+        window.kioskAudio.playTap();
+        window.kioskCamera.toggleFlip();
       });
     }
 

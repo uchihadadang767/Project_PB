@@ -17,6 +17,10 @@ class KioskCamera {
     this.progressCircleEl = null;
     this.flashEnabled = true;
     this.isCapturing = false;
+
+    // Flip/Mirror orientation: default to true (selfie flipped), or read saved preference
+    const saved = localStorage.getItem('kiosk_camera_flipped');
+    this.isFlipped = saved !== null ? saved === 'true' : true;
   }
 
   initElements() {
@@ -29,6 +33,51 @@ class KioskCamera {
     this.countdownModalEl = document.getElementById('countdown-modal');
     this.countdownValEl = document.getElementById('countdown-val');
     this.progressCircleEl = document.getElementById('svg-progress-circle');
+
+    this.applyFlipState();
+  }
+
+  applyFlipState() {
+    if (this.videoEl) {
+      if (this.isFlipped) {
+        this.videoEl.classList.add('camera-flipped');
+      } else {
+        this.videoEl.classList.remove('camera-flipped');
+      }
+    }
+    if (this.simCanvasEl) {
+      if (this.isFlipped) {
+        this.simCanvasEl.classList.add('camera-flipped');
+      } else {
+        this.simCanvasEl.classList.remove('camera-flipped');
+      }
+    }
+    this.updateMirrorUI();
+  }
+
+  toggleFlip() {
+    this.isFlipped = !this.isFlipped;
+    try {
+      localStorage.setItem('kiosk_camera_flipped', String(this.isFlipped));
+    } catch (e) {}
+    this.applyFlipState();
+    return this.isFlipped;
+  }
+
+  updateMirrorUI() {
+    const mirrorState = document.getElementById('mirror-state');
+    const mirrorIcon = document.getElementById('mirror-icon');
+    const badge = document.getElementById('camera-orientation-badge');
+
+    if (mirrorState) {
+      mirrorState.textContent = this.isFlipped ? 'MIRROR: ON' : 'MIRROR: OFF';
+    }
+    if (mirrorIcon) {
+      mirrorIcon.textContent = this.isFlipped ? 'flip' : 'sync_alt';
+    }
+    if (badge) {
+      badge.textContent = this.isFlipped ? 'MIRROR: ON' : 'MIRROR: OFF';
+    }
   }
 
   async startCamera() {
@@ -240,11 +289,19 @@ class KioskCamera {
     if (this.isLive && this.videoEl && this.videoEl.videoWidth) {
       canvas.width = this.videoEl.videoWidth;
       canvas.height = this.videoEl.videoHeight;
-      // Normal camera capture without mirroring
+      // Match the exact orientation seen in the viewfinder
+      if (this.isFlipped) {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
       ctx.drawImage(this.videoEl, 0, 0, canvas.width, canvas.height);
     } else if (this.simCanvasEl) {
       canvas.width = this.simCanvasEl.width;
       canvas.height = this.simCanvasEl.height;
+      if (this.isFlipped) {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
       ctx.drawImage(this.simCanvasEl, 0, 0, canvas.width, canvas.height);
     } else {
       canvas.width = 640;
