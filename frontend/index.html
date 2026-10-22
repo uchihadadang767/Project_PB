@@ -88,73 +88,9 @@
 <body class="bg-surface font-body-md text-on-surface min-h-screen selection:bg-secondary-container selection:text-primary">
 
   <!-- =========================================================================
-       PERSISTENT TOP HARDWARE TELEMETRY HEADER
-       ========================================================================= -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-low border-b-2 border-primary shadow-[0_4px_0_0_#1c1b1b]">
-    <div class="h-28 w-full px-4 sm:px-margin-kiosk flex flex-col justify-between py-space-xs">
-      <!-- Upper Diagnostic Bar -->
-      <div class="h-9 border-b border-primary/20 flex items-center justify-between font-label-sm text-label-sm">
-        <div class="flex items-center gap-space-md">
-          <span class="flex items-center gap-space-xs text-on-surface font-label-sm">
-            <span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse inline-block"></span> SYS.READY
-          </span>
-          <span class="text-outline">|</span>
-          <span class="text-on-surface-variant font-label-sm live-clock-time">12:42:00 PM</span>
-          <span class="text-outline">|</span>
-          <span class="text-on-surface font-label-sm">HEAD: [OK]</span>
-          <span class="text-outline">|</span>
-          <span class="text-on-surface-variant font-label-sm flex items-center gap-1">
-            <span class="material-symbols-outlined text-[14px]">receipt_long</span> ROLL: <span class="kiosk-paper-pct font-bold">94%</span>
-          </span>
-        </div>
-        <div class="flex items-center gap-space-md">
-          <button id="btn-toggle-audio" class="flex items-center gap-1 px-space-xs py-0.5 border border-primary text-on-surface bg-surface-container hover:bg-primary hover:text-on-primary transition-colors text-label-sm cursor-pointer" type="button" title="Toggle Synthesizer Audio">
-            <span class="material-symbols-outlined text-[14px]">volume_up</span> AUDIO: ON
-          </button>
-          <span class="bg-secondary-container text-on-secondary-container font-label-sm px-space-xs py-0.5 border border-primary font-bold">
-            KIOSK #04
-          </span>
-        </div>
-      </div>
-
-      <!-- Lower Branding & Stage Navigation Breadcrumbs -->
-      <div class="h-16 flex items-center justify-between">
-        <div class="flex items-center gap-space-md cursor-pointer" onclick="window.kioskApp && window.kioskApp.goToScreen('welcome')">
-          <div class="h-9 w-9 bg-primary text-on-primary border border-primary flex items-center justify-center font-bold font-code-terminal text-lg">
-            TB
-          </div>
-          <div class="flex flex-col">
-            <div class="flex items-center gap-space-xs">
-              <span class="font-headline-md text-headline-md tracking-tight uppercase text-primary font-bold">THERMAL BOOTH</span>
-              <span class="font-code-terminal text-code-terminal px-space-xs bg-primary text-on-primary font-bold">SYS.04</span>
-            </div>
-            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider hidden sm:inline">High-Resolution Direct Thermal Apparatus</span>
-          </div>
-        </div>
-
-        <!-- 6-Stage Persistent Navigation Breadcrumbs -->
-        <nav class="hidden lg:flex items-center gap-space-xs">
-          <a href="#" class="header-step-nav px-space-sm py-space-xs font-label-sm text-label-sm uppercase transition-all" data-step-idx="1" data-screen="welcome">01 // STANDBY</a>
-          <a href="#" class="header-step-nav px-space-sm py-space-xs font-label-sm text-label-sm uppercase transition-all" data-step-idx="2" data-screen="frame">02 // FRAME</a>
-          <a href="#" class="header-step-nav px-space-sm py-space-xs font-label-sm text-label-sm uppercase transition-all" data-step-idx="3" data-screen="payment">03 // PAYMENT</a>
-          <a href="#" class="header-step-nav px-space-sm py-space-xs font-label-sm text-label-sm uppercase transition-all" data-step-idx="4" data-screen="camera">04 // CAPTURE</a>
-          <a href="#" class="header-step-nav px-space-sm py-space-xs font-label-sm text-label-sm uppercase transition-all" data-step-idx="5" data-screen="customize">05 // DITHER & STYLE</a>
-          <a href="#" class="header-step-nav px-space-sm py-space-xs font-label-sm text-label-sm uppercase transition-all" data-step-idx="6" data-screen="finish">06 // DISPATCH</a>
-        </nav>
-
-        <div class="flex items-center gap-space-md">
-          <span class="session-id-display font-code-terminal text-label-sm bg-surface-container px-space-xs py-1 border border-primary font-bold">
-            SESS-4082
-          </span>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- =========================================================================
        MAIN INTERACTION VIEWPORT
        ========================================================================= -->
-  <main class="w-full pt-32 pb-28 min-h-screen bg-surface">
+  <main class="w-full pt-6 pb-28 min-h-screen bg-surface">
 
     <!-- -----------------------------------------------------------------------
          SCREEN 1: WELCOME / IDLE (STANDBY)
