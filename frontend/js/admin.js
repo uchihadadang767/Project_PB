@@ -1528,7 +1528,7 @@ class AdminApp {
     const env = this.collectConfigForm();
     if (statusEl) {
       statusEl.textContent = 'Mengirim perintah feed test ke printer...';
-      statusEl.className = 'text-xs font-mono text-emerald-400 animate-pulse';
+      statusEl.className = 'text-xs font-mono text-emerald-500 animate-pulse font-bold';
     }
 
     try {
@@ -1544,7 +1544,15 @@ class AdminApp {
           autoCut: env.AUTO_CUT
         })
       });
-      const data = await res.json();
+
+      let data;
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error(`Server response tidak valid (${res.status}): ${text.slice(0, 80) || 'Koneksi terputus saat request'}`);
+      }
+
       if (statusEl) {
         statusEl.textContent = data.message || (data.success ? 'Berhasil dikirim' : 'Gagal mencetak');
         statusEl.className = `text-xs font-mono ${data.success ? 'text-emerald-500 font-bold' : 'text-red-500 font-bold'}`;
