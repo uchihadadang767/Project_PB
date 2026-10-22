@@ -1,6 +1,6 @@
 /**
- * Admin Dashboard Controller - Sleek Dark Theme
- * Manages Orders ACC, QR Payment, Frame Geometry, Photo Styles, and Archives
+ * Admin Dashboard Controller - Sleek Clean Theme & Dedicated Module Pages
+ * Manages Clean 5-Button Home Dashboard, Dedicated Sub-Pages, Orders ACC, QR Payment, Frame Geometry, Photo Styles, and Archives
  */
 
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -9,7 +9,7 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
 
 class AdminApp {
   constructor() {
-    this.currentTab = 'tab-orders';
+    this.currentTab = null;
     this.orders = [];
     this.frames = [];
     this.styles = [];
@@ -33,9 +33,16 @@ class AdminApp {
     // Initial data load
     await this.fetchConfig();
     await this.fetchOrders();
-    await this.fetchPhotos();
 
-    // Start polling orders every 3 seconds
+    // Check URL routing on start (e.g. /admin vs /admin#orders)
+    this.handleRouting();
+
+    // Listen to hash changes for browser forward/backward buttons
+    window.addEventListener('hashchange', () => {
+      this.handleRouting();
+    });
+
+    // Start polling orders in background every 3 seconds
     this.pollInterval = setInterval(() => {
       this.fetchOrders(true);
     }, 3000);
@@ -84,41 +91,140 @@ class AdminApp {
   }
 
   initTabs() {
-    // Top 5 Squircle Cards
+    // Top 5 Squircle Cards on Main Dashboard
     const navCards = document.querySelectorAll('.dashboard-nav-card');
     navCards.forEach(card => {
       card.addEventListener('click', () => {
         const tabId = card.getAttribute('data-tab');
-        this.switchTab(tabId);
+        this.openModulePage(tabId, true);
       });
     });
+
+    // Back to Dashboard Button
+    const backBtn = document.getElementById('btn-back-to-dashboard');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        this.showDashboard(true);
+      });
+    }
   }
 
-  switchTab(tabId) {
+  handleRouting() {
+    const rawHash = window.location.hash.replace('#', '').trim();
+    if (['orders', 'qr', 'frames', 'styles', 'photos'].includes(rawHash)) {
+      this.openModulePage(`tab-${rawHash}`, false);
+    } else {
+      this.showDashboard(false);
+    }
+  }
+
+  showDashboard(updateHash = true) {
+    this.currentTab = null;
+    if (updateHash) {
+      history.pushState(null, '', window.location.pathname);
+    }
+
+    const viewDash = document.getElementById('view-dashboard');
+    const viewModule = document.getElementById('view-module-page');
+
+    if (viewDash) {
+      viewDash.classList.remove('hidden');
+      viewDash.classList.add('flex');
+    }
+    if (viewModule) {
+      viewModule.classList.add('hidden');
+      viewModule.classList.remove('flex');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  openModulePage(tabId, updateHash = true) {
     this.currentTab = tabId;
+    const moduleId = tabId.replace('tab-', '');
 
-    // Highlight active card
-    document.querySelectorAll('.dashboard-nav-card').forEach(c => {
-      if (c.getAttribute('data-tab') === tabId) {
-        c.classList.add('active');
+    if (updateHash) {
+      window.location.hash = moduleId;
+    }
+
+    const viewDash = document.getElementById('view-dashboard');
+    const viewModule = document.getElementById('view-module-page');
+
+    // Switch view visibility
+    if (viewDash) {
+      viewDash.classList.add('hidden');
+      viewDash.classList.remove('flex');
+    }
+    if (viewModule) {
+      viewModule.classList.remove('hidden');
+      viewModule.classList.add('flex');
+    }
+
+    // Show only active section inside view-module-page
+    document.querySelectorAll('.admin-tab-content').forEach(section => {
+      if (section.id === tabId) {
+        section.classList.remove('hidden');
+        section.classList.add('block');
       } else {
-        c.classList.remove('active');
+        section.classList.add('hidden');
+        section.classList.remove('block');
       }
     });
 
-    // Display corresponding section
-    document.querySelectorAll('.admin-tab-content').forEach(content => {
-      if (content.id === tabId) {
-        content.classList.remove('hidden');
-        content.classList.add('block');
-      } else {
-        content.classList.add('hidden');
-        content.classList.remove('block');
-      }
-    });
+    // Update Header Icon, Title & Subtitle for this dedicated page
+    this.updateModuleHeader(moduleId);
 
-    if (tabId === 'tab-photos') {
+    if (moduleId === 'photos') {
       this.fetchPhotos();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  updateModuleHeader(moduleId) {
+    const meta = {
+      orders: {
+        title: 'Persetujuan Order & Payment',
+        desc: 'Validasi & ACC sesi bayar QRIS/Cash secara real-time untuk membuka kamera kiosk',
+        icon: 'payments',
+        glow: 'glow-orange'
+      },
+      qr: {
+        title: 'QRIS Gateway & Pengaturan Tarif',
+        desc: 'Konfigurasi foto QRIS toko, NMID merchant, dan tarif harga per sesi booth',
+        icon: 'qr_code_2',
+        glow: 'glow-blue'
+      },
+      frames: {
+        title: 'Geometri Frame & Template Struk',
+        desc: 'Kelola layout frame foto, jumlah pose jepretan, aspect ratio, dan harga spesifik frame',
+        icon: 'grid_view',
+        glow: 'glow-purple'
+      },
+      styles: {
+        title: 'Photo Styles & Algoritma Dithering',
+        desc: 'Preset dithering 1-bit thermal, filter default di kiosk, dan kurva kontras printer',
+        icon: 'auto_fix_high',
+        glow: 'glow-green'
+      },
+      photos: {
+        title: 'Data Foto & Galeri Arsip Struk',
+        desc: 'Riwayat cetak struk 80mm tiap sesi, unduh master file PNG, dan perintah reprint docket',
+        icon: 'photo_library',
+        glow: 'glow-cyan'
+      }
+    };
+
+    const cur = meta[moduleId] || meta.orders;
+    const titleEl = document.getElementById('module-page-title');
+    const descEl = document.getElementById('module-page-desc');
+    const iconContainer = document.getElementById('module-page-icon');
+
+    if (titleEl) titleEl.textContent = cur.title;
+    if (descEl) descEl.textContent = cur.desc;
+    if (iconContainer) {
+      iconContainer.className = `w-10 h-10 rounded-xl ${cur.glow} flex items-center justify-center text-white`;
+      iconContainer.innerHTML = `<span class="material-symbols-outlined text-[20px]">${cur.icon}</span>`;
     }
   }
 
