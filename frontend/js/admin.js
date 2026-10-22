@@ -1212,7 +1212,33 @@ class AdminApp {
     if (!modal) return;
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+    await this.fetchAvailablePrinters();
     await this.loadEnvConfig();
+  }
+
+  async fetchAvailablePrinters() {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/printers`);
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.printers)) {
+        const select = document.getElementById('cfg-printer-name');
+        if (select) {
+          const current = data.currentPrinter || (this.envObj ? this.envObj.PRINTER_NAME : '') || (this.settings ? this.settings.printerName : '');
+          select.innerHTML = '<option value="">-- Gunakan Default Windows Printer --</option>';
+          data.printers.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            opt.textContent = `${p.name} ${p.isDefault ? '(Default Windows)' : ''}`;
+            if (p.name === current) {
+              opt.selected = true;
+            }
+            select.appendChild(opt);
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to fetch printers:', e);
+    }
   }
 
   closeConfigModal() {
@@ -1273,6 +1299,7 @@ class AdminApp {
     if (paymentMode) paymentMode.value = env.PAYMENT_MODE || this.settings.paymentMode || 'manual_acc';
     if (autoTimeout) autoTimeout.value = env.AUTO_ACC_TIMEOUT || this.settings.autoAccTimeout || 30;
 
+    const prnName = document.getElementById('cfg-printer-name');
     const prnInterface = document.getElementById('cfg-printer-interface');
     const prnIp = document.getElementById('cfg-printer-ip');
     const prnWidth = document.getElementById('cfg-paper-width');
@@ -1280,6 +1307,9 @@ class AdminApp {
     const prnDensityVal = document.getElementById('cfg-density-val');
     const prnAutoCut = document.getElementById('cfg-auto-cut');
 
+    if (prnName && (env.PRINTER_NAME || this.settings.printerName)) {
+      prnName.value = env.PRINTER_NAME || this.settings.printerName;
+    }
     if (prnInterface) prnInterface.value = env.PRINTER_INTERFACE || 'direct_usb';
     if (prnIp) prnIp.value = env.PRINTER_IP || '192.168.1.200:9100';
     if (prnWidth) prnWidth.value = env.PAPER_WIDTH || '80mm';
@@ -1323,12 +1353,14 @@ class AdminApp {
     if (paymentMode) env.PAYMENT_MODE = paymentMode.value;
     if (autoTimeout) env.AUTO_ACC_TIMEOUT = autoTimeout.value.trim() || '30';
 
+    const prnName = document.getElementById('cfg-printer-name');
     const prnInterface = document.getElementById('cfg-printer-interface');
     const prnIp = document.getElementById('cfg-printer-ip');
     const prnWidth = document.getElementById('cfg-paper-width');
     const prnDensity = document.getElementById('cfg-printer-density');
     const prnAutoCut = document.getElementById('cfg-auto-cut');
 
+    if (prnName) env.PRINTER_NAME = prnName.value;
     if (prnInterface) env.PRINTER_INTERFACE = prnInterface.value;
     if (prnIp) env.PRINTER_IP = prnIp.value.trim();
     if (prnWidth) env.PAPER_WIDTH = prnWidth.value;
@@ -1504,6 +1536,7 @@ class AdminApp {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          printerName: env.PRINTER_NAME || '',
           printerType: env.PRINTER_INTERFACE,
           printerIp: env.PRINTER_IP,
           paperWidth: env.PAPER_WIDTH,

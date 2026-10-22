@@ -512,7 +512,23 @@ class KioskApp {
         reprintBtn.disabled = true;
         reprintBtn.innerHTML = `<span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-secondary-container animate-ping"></span> DISPENSING COPY #${this.state.copiesPrinted}...</span><span class="font-code-terminal text-label-md bg-secondary-container text-on-secondary-container px-2 py-1 font-bold">+1 COPY</span>`;
 
-        // Re-run the synchronized dispensing animation & auto-print for this copy
+        // Send reprint job directly to backend thermal printer apparatus
+        if (this.state.finalReceiptImage) {
+          fetch(`${API_BASE}/api/print`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: this.state.session.id,
+              stripImageBase64: this.state.finalReceiptImage,
+              metadata: {
+                reprint: true,
+                copyIndex: this.state.copiesPrinted
+              }
+            })
+          }).catch(err => console.warn('Reprint backend error:', err));
+        }
+
+        // Re-run the synchronized dispensing animation for this copy
         this.startFinishSequence({ isReprint: true });
 
         setTimeout(() => {
@@ -1205,13 +1221,8 @@ class KioskApp {
     // 4. Audio stepper motor feed sound with completion cutter snip
     window.kioskAudio.playDispenseSound();
 
-    // 5. Trigger Auto Print synchronized with paper emergence (~350ms delay)
-    // In kiosk mode (--kiosk-printing), this silently feeds paper in real-time with the UI!
-    setTimeout(() => {
-      this.autoPrintThermalReceipt(this.state.finalReceiptImage);
-    }, 350);
-
-    // 6. Smooth progress meter (0% -> 100% over 3.2 seconds)
+    // 5. Smooth progress meter (0% -> 100% over 3.2 seconds)
+    // Hardware print is handled silently in background by backend apparatus without browser popups!
     if (this.finishProgressTimer) {
       clearInterval(this.finishProgressTimer);
     }

@@ -847,16 +847,22 @@
         <div id="cfg-tab-printer" class="cfg-tab-content space-y-4 hidden">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
             <div>
-              <label class="block text-black mb-1.5 font-bold">INTERFACE PRINTER</label>
-              <select id="cfg-printer-interface" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
-                <option value="direct_usb">DIRECT USB (Direct ESC/POS Raw)</option>
-                <option value="network_tcp">NETWORK LAN / TCP (IP Socket Port 9100)</option>
-                <option value="system_spooler">WINDOWS DRIVER SPOOLER (System Print)</option>
+              <label class="block text-black mb-1.5 font-bold">PILIH PRINTER WINDOWS (TERHUBUNG)</label>
+              <select id="cfg-printer-name" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
+                <option value="">-- Gunakan Default Windows Printer --</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-black mb-1.5 font-bold">PRINTER IP / PORT ADDRESS</label>
+              <label class="block text-black mb-1.5 font-bold">INTERFACE PRINTER</label>
+              <select id="cfg-printer-interface" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
+                <option value="direct_usb">WINDOWS SPOOLER / USB (Direkomendasikan)</option>
+                <option value="network_tcp">NETWORK LAN / TCP (IP Socket Port 9100)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-black mb-1.5 font-bold">PRINTER IP / PORT ADDRESS (Opsional)</label>
               <input type="text" id="cfg-printer-ip" placeholder="192.168.1.200:9100 atau COM3" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
             </div>
 

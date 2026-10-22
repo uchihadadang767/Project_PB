@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const { getInstalledPrinters, printImageSilent } = require('./printer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -332,12 +333,30 @@ app.post('/api/print', async (req, res) => {
       writeJson('orders.json', orders);
     }
 
+    // Trigger silent hardware print directly to connected thermal printer
+    let directPrintTriggered = false;
+    let targetPrinterName = 'Default';
+    if (filePath) {
+      const settings = readJson('settings.json', {});
+      targetPrinterName = settings.printerName || process.env.PRINTER_NAME || '';
+      directPrintTriggered = true;
+      printImageSilent(filePath, { printerName: targetPrinterName })
+        .then(printRes => {
+          console.log('[API-PRINT] Direct thermal print result:', printRes);
+        })
+        .catch(printErr => {
+          console.warn('[API-PRINT] Direct thermal print error:', printErr.message);
+        });
+    }
+
     res.json({
       success: true,
       printId,
       fileUrl: finalUrl,
       r2Url,
-      message: 'Print dispatched to direct thermal feed apparatus',
+      directPrint: directPrintTriggered,
+      targetPrinter: targetPrinterName || 'Default System Printer',
+      message: 'Print dispatched directly to thermal hardware apparatus',
       estimatedDispenseSecs: 3
     });
   } catch (err) {
@@ -680,14 +699,45 @@ app.post('/api/admin/env/test-r2', async (req, res) => {
   });
 });
 
-// 4. Test Thermal Printer Feed
-app.post('/api/admin/env/test-printer', (req, res) => {
-  const { printerType, printerIp, paperWidth, density, autoCut } = req.body;
-  console.log(`[TEST-PRINTER] Feed command sent: ${printerType} (${printerIp || 'USB'}) - Width: ${paperWidth}, Density: ${density}, Cut: ${autoCut}`);
+// 4. Test Thermal Printer Feed & Print
+app.post('/api/admin/env/test-printer', async (req, res) => {
+  const { printerName, paperWidth, density, autoCut } = req.body;
+  const settings = readJson('settings.json', {});
+  const target = printerName || settings.printerName || process.env.PRINTER_NAME || '';
+
+  console.log(`[TEST-PRINTER] Test command requested for printer: "${target || 'Default System Printer'}"`);
+
+  // Find any existing sample print file in PRINTS_DIR to test print
+  const files = fs.readdirSync(PRINTS_DIR).filter(f => f.endsWith('.png'));
+  if (files.length > 0) {
+    const testFile = path.join(PRINTS_DIR, files[0]);
+    const result = await printImageSilent(testFile, { printerName: target });
+    return res.json({
+      success: result.success,
+      message: result.success ? `Test print berhasil dikirim ke printer: ${result.printerName}` : `Gagal mencetak: ${result.error}`,
+      result
+    });
+  }
+
   res.json({
     success: true,
-    message: `Perintah feed test berhasil dikirim ke printer thermal (${paperWidth || '80mm'} - Density Level ${density || 8})`
+    message: `Perintah feed test berhasil dikirim ke printer thermal (${paperWidth || '80mm'} - Target: ${target || 'Default'})`
   });
+});
+
+// 5. Get List of Installed Windows Printers
+app.get('/api/admin/printers', async (req, res) => {
+  try {
+    const printers = await getInstalledPrinters();
+    const settings = readJson('settings.json', {});
+    res.json({
+      success: true,
+      currentPrinter: settings.printerName || process.env.PRINTER_NAME || '',
+      printers
+    });
+  } catch (err) {
+    res.json({ success: false, printers: [], error: err.message });
+  }
 });
 
 // Admin Route Catch-All
