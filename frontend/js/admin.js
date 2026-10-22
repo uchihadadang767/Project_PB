@@ -188,31 +188,31 @@ class AdminApp {
         title: 'Persetujuan Order & Payment',
         desc: 'Validasi & ACC sesi bayar QRIS/Cash secara real-time untuk membuka kamera kiosk',
         icon: 'payments',
-        glow: 'glow-orange'
+        bg: 'bg-[#ffb703]'
       },
       qr: {
         title: 'QRIS Gateway & Pengaturan Tarif',
         desc: 'Konfigurasi foto QRIS toko, NMID merchant, dan tarif harga per sesi booth',
         icon: 'qr_code_2',
-        glow: 'glow-blue'
+        bg: 'bg-[#38bdf8]'
       },
       frames: {
         title: 'Geometri Frame & Template Struk',
         desc: 'Kelola layout frame foto, jumlah pose jepretan, aspect ratio, dan harga spesifik frame',
         icon: 'grid_view',
-        glow: 'glow-purple'
+        bg: 'bg-[#c084fc]'
       },
       styles: {
         title: 'Photo Styles & Algoritma Dithering',
         desc: 'Preset dithering 1-bit thermal, filter default di kiosk, dan kurva kontras printer',
         icon: 'auto_fix_high',
-        glow: 'glow-green'
+        bg: 'bg-[#4ade80]'
       },
       photos: {
         title: 'Data Foto & Galeri Arsip Struk',
         desc: 'Riwayat cetak struk 80mm tiap sesi, unduh master file PNG, dan perintah reprint docket',
         icon: 'photo_library',
-        glow: 'glow-cyan'
+        bg: 'bg-[#2dd4bf]'
       }
     };
 
@@ -224,7 +224,7 @@ class AdminApp {
     if (titleEl) titleEl.textContent = cur.title;
     if (descEl) descEl.textContent = cur.desc;
     if (iconContainer) {
-      iconContainer.className = `w-10 h-10 rounded-xl ${cur.glow} flex items-center justify-center text-white`;
+      iconContainer.className = `w-10 h-10 rounded-xl ${cur.bg} border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black`;
       iconContainer.innerHTML = `<span class="material-symbols-outlined text-[20px]">${cur.icon}</span>`;
     }
   }
@@ -348,38 +348,38 @@ class AdminApp {
 
       let statusBadge = '';
       if (isPending) {
-        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold text-xs"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> MENUNGGU ACC</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ffb703] text-black border border-black font-bold text-xs shadow-[1px_1px_0px_#000]"><span class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></span> MENUNGGU ACC</span>`;
       } else if (isApproved) {
-        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold text-xs">✓ APPROVED</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#4ade80] text-black border border-black font-bold text-xs shadow-[1px_1px_0px_#000]">✓ APPROVED</span>`;
       } else if (isCompleted) {
-        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold text-xs">DICETAK</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#38bdf8] text-black border border-black font-bold text-xs shadow-[1px_1px_0px_#000]">DICETAK</span>`;
       } else {
-        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-white/5 font-bold text-xs">${order.status || 'UNKNOWN'}</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-200 text-black border border-black font-bold text-xs">${order.status || 'UNKNOWN'}</span>`;
       }
 
       const orderTime = order.createdAt ? new Date(order.createdAt).toLocaleTimeString('id-ID') : '--:--';
 
       return `
-        <tr class="hover:bg-white/[0.03] transition-colors ${isPending ? 'bg-amber-500/[0.04]' : ''}">
-          <td class="p-4 font-bold text-white">${order.txId || order.id}</td>
-          <td class="p-4 font-bold text-blue-400">${order.sessionId}</td>
-          <td class="p-4 text-slate-200">${order.frame || 'Standard 3-Cut'}</td>
-          <td class="p-4 font-bold text-emerald-400">${order.amountFormatted || 'Rp ' + Number(order.amount || 35000).toLocaleString('id-ID')}</td>
-          <td class="p-4"><span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-slate-300 uppercase">${order.method || 'QRIS'}</span></td>
-          <td class="p-4 text-slate-400">${orderTime}</td>
+        <tr class="hover:bg-gray-50 transition-colors border-b border-black/10 ${isPending ? 'bg-amber-100/40' : ''}">
+          <td class="p-4 font-bold text-black">${order.txId || order.id}</td>
+          <td class="p-4 font-bold text-blue-700">${order.sessionId}</td>
+          <td class="p-4 text-black font-medium">${order.frame || 'Standard 3-Cut'}</td>
+          <td class="p-4 font-bold text-[#059669]">${order.amountFormatted || 'Rp ' + Number(order.amount || 35000).toLocaleString('id-ID')}</td>
+          <td class="p-4"><span class="px-2 py-0.5 rounded-md bg-[#ebeae5] border border-black text-[11px] text-black font-bold uppercase">${order.method || 'QRIS'}</span></td>
+          <td class="p-4 text-gray-700">${orderTime}</td>
           <td class="p-4">${statusBadge}</td>
           <td class="p-4 text-right">
             <div class="flex items-center justify-end gap-2">
               ${isPending ? `
-                <button class="btn-acc-order px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.4)] text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" data-id="${order.id}">
+                <button class="btn-acc-order px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono font-bold border-2 border-black shadow-[2px_2px_0px_#000] text-xs flex items-center gap-1.5 transition-all cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none" data-id="${order.id}">
                   <span class="material-symbols-outlined text-[16px]">check_circle</span>
-                  <span>ACC / APPROVE</span>
+                  <span>ACC</span>
                 </button>
-                <button class="btn-reject-order px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 text-xs font-bold transition-all cursor-pointer" data-id="${order.id}" title="Tolak Pesanan">
+                <button class="btn-reject-order px-2.5 py-1.5 rounded-lg bg-white hover:bg-red-50 text-red-600 border-2 border-black text-xs font-bold transition-all cursor-pointer shadow-[2px_2px_0px_#000]" data-id="${order.id}" title="Tolak Pesanan">
                   ✕
                 </button>
               ` : `
-                <span class="text-xs text-slate-500 font-bold uppercase">${order.status}</span>
+                <span class="text-xs text-gray-500 font-bold uppercase">${order.status}</span>
               `}
             </div>
           </td>
@@ -438,11 +438,11 @@ class AdminApp {
     filterButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         filterButtons.forEach(b => {
-          b.classList.remove('active', 'bg-blue-600', 'text-white');
-          b.classList.add('bg-white/5', 'text-slate-300');
+          b.classList.remove('active', 'bg-[#ffb703]', 'text-black', 'border-black');
+          b.classList.add('bg-white', 'text-black', 'border-black');
         });
-        btn.classList.add('active', 'bg-blue-600', 'text-white');
-        btn.classList.remove('bg-white/5', 'text-slate-300');
+        btn.classList.add('active', 'bg-[#ffb703]', 'text-black', 'border-black');
+        btn.classList.remove('bg-white', 'text-black', 'border-black');
         this.activeFilter = btn.getAttribute('data-filter');
         this.renderOrdersTable();
       });
@@ -707,45 +707,45 @@ class AdminApp {
 
     container.innerHTML = this.frames.map(frame => {
       return `
-        <div class="glass-panel rounded-2xl p-5 border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between relative ${frame.active ? '' : 'opacity-50'}">
+        <div class="bg-white rounded-2xl p-5 border-2 border-black shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#ffb703] transition-all flex flex-col justify-between relative ${frame.active ? '' : 'opacity-50'}">
           ${frame.badge ? `
-            <div class="absolute top-4 right-4 bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-500/30 uppercase">
+            <div class="absolute top-4 right-4 bg-[#ffb703] text-black border border-black font-mono text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-[1px_1px_0px_#000]">
               ${frame.badge}
             </div>
           ` : ''}
 
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full ${frame.active ? 'bg-emerald-400' : 'bg-slate-600'} inline-block"></span>
-              <h3 class="text-base font-bold text-white uppercase">${frame.title}</h3>
+              <span class="w-2.5 h-2.5 rounded-full ${frame.active ? 'bg-emerald-500' : 'bg-gray-400'} border border-black inline-block"></span>
+              <h3 class="text-base font-bold text-black uppercase font-display">${frame.title}</h3>
             </div>
-            <p class="text-xs text-slate-400 line-clamp-2">${frame.description || 'Standard thermal continuous layout'}</p>
+            <p class="text-xs text-gray-600 line-clamp-2">${frame.description || 'Standard thermal continuous layout'}</p>
           </div>
 
           <!-- Mini Layout Representation -->
-          <div class="my-4 p-3 rounded-xl bg-black/40 border border-white/5 flex justify-center items-center">
-            <div class="w-20 bg-white/5 border border-white/10 rounded-lg p-1.5 flex flex-col gap-1 shadow-sm">
-              <div class="h-1 bg-white/20 w-3/4 mx-auto rounded-full"></div>
+          <div class="my-4 p-3 rounded-xl bg-[#ebeae5] border-2 border-black flex justify-center items-center">
+            <div class="w-20 bg-white border-2 border-black rounded-lg p-1.5 flex flex-col gap-1 shadow-sm">
+              <div class="h-1 bg-black/30 w-3/4 mx-auto rounded-full"></div>
               ${Array.from({ length: Math.min(frame.poses || 3, 4) }).map(() => `
-                <div class="aspect-square rounded bg-white/10 border border-white/10 flex items-center justify-center text-[10px]">📷</div>
+                <div class="aspect-square rounded bg-[#ebeae5] border border-black flex items-center justify-center text-[10px]">📷</div>
               `).join('')}
             </div>
           </div>
 
-          <div class="pt-3 border-t border-white/5 flex flex-col gap-3 font-mono text-xs">
-            <div class="flex items-center justify-between text-slate-300">
+          <div class="pt-3 border-t-2 border-black/10 flex flex-col gap-3 font-mono text-xs">
+            <div class="flex items-center justify-between text-black font-bold">
               <span>${frame.poses} POSES (${frame.aspect || '1:1'})</span>
-              <strong class="text-sm font-bold text-emerald-400">${frame.priceFormatted || 'Rp ' + Number(frame.price).toLocaleString('id-ID')}</strong>
+              <strong class="text-sm font-bold text-[#059669]">${frame.priceFormatted || 'Rp ' + Number(frame.price).toLocaleString('id-ID')}</strong>
             </div>
 
             <div class="flex items-center justify-between gap-2 pt-1">
-              <button class="btn-toggle-frame flex-1 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-bold text-slate-200 transition-colors cursor-pointer" data-id="${frame.id}">
+              <button class="btn-toggle-frame flex-1 h-8 rounded-lg bg-[#ebeae5] hover:bg-[#dadad6] border-2 border-black text-[11px] font-bold text-black transition-colors cursor-pointer shadow-[1px_1px_0px_#000]" data-id="${frame.id}">
                 ${frame.active ? 'NONAKTIFKAN' : 'AKTIFKAN'}
               </button>
-              <button class="btn-edit-frame h-8 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-blue-400 transition-colors cursor-pointer" data-id="${frame.id}" title="Edit Frame">
+              <button class="btn-edit-frame h-8 px-3 rounded-lg bg-white hover:bg-[#ebeae5] border-2 border-black text-xs text-black font-bold transition-colors cursor-pointer shadow-[1px_1px_0px_#000]" data-id="${frame.id}" title="Edit Frame">
                 ✎
               </button>
-              <button class="btn-delete-frame h-8 px-3 rounded-lg bg-white/5 hover:bg-red-500/20 text-xs text-red-400 transition-colors cursor-pointer" data-id="${frame.id}" title="Hapus Frame">
+              <button class="btn-delete-frame h-8 px-3 rounded-lg bg-white hover:bg-red-50 border-2 border-black text-xs text-red-600 font-bold transition-colors cursor-pointer shadow-[1px_1px_0px_#000]" data-id="${frame.id}" title="Hapus Frame">
                 ✕
               </button>
             </div>
@@ -845,35 +845,35 @@ class AdminApp {
 
     container.innerHTML = this.styles.map((style, idx) => {
       return `
-        <div class="glass-panel rounded-2xl p-6 border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between gap-4">
+        <div class="bg-white rounded-2xl p-6 border-2 border-black shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#ffb703] transition-all flex flex-col justify-between gap-4">
           <div class="flex items-start justify-between">
             <div>
-              <span class="text-[10px] font-mono text-emerald-400 uppercase font-semibold">PRESET #${idx + 1}</span>
-              <h3 class="text-base font-bold text-white">${style.name}</h3>
-              <span class="text-xs text-slate-400">${style.subtitle || ''}</span>
+              <span class="text-[10px] font-mono text-black font-bold uppercase">PRESET #${idx + 1}</span>
+              <h3 class="text-base font-bold text-black font-display">${style.name}</h3>
+              <span class="text-xs text-gray-600">${style.subtitle || ''}</span>
             </div>
             ${style.isDefault ? `
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold uppercase">DEFAULT</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-[#ffb703] text-black border border-black text-[10px] font-mono font-bold uppercase shadow-[1px_1px_0px_#000]">DEFAULT</span>
             ` : ''}
           </div>
 
-          <p class="text-xs text-slate-400 leading-relaxed">${style.description}</p>
+          <p class="text-xs text-gray-600 leading-relaxed font-sans">${style.description}</p>
 
-          <div class="p-3.5 rounded-xl bg-black/40 border border-white/5 flex flex-col gap-2 font-mono text-xs">
-            <div class="flex justify-between items-center text-slate-300">
+          <div class="p-3.5 rounded-xl bg-[#ebeae5] border-2 border-black flex flex-col gap-2 font-mono text-xs">
+            <div class="flex justify-between items-center text-black font-bold">
               <span>KONTRAS THERMAL:</span>
-              <strong id="val-contrast-${style.id}" class="text-cyan-400">${style.contrast || 150}%</strong>
+              <strong id="val-contrast-${style.id}" class="text-black font-black">${style.contrast || 150}%</strong>
             </div>
-            <input type="range" min="100" max="250" value="${style.contrast || 150}" class="style-contrast-slider accent-blue-500 w-full cursor-pointer" data-id="${style.id}">
+            <input type="range" min="100" max="250" value="${style.contrast || 150}" class="style-contrast-slider accent-[#ffb703] w-full cursor-pointer" data-id="${style.id}">
           </div>
 
-          <div class="flex items-center justify-between pt-2 border-t border-white/5 text-xs font-mono">
-            <label class="flex items-center gap-2 cursor-pointer text-slate-300">
-              <input type="checkbox" class="style-active-toggle w-4 h-4 rounded accent-blue-500" data-id="${style.id}" ${style.active ? 'checked' : ''}>
+          <div class="flex items-center justify-between pt-2 border-t-2 border-black/10 text-xs font-mono">
+            <label class="flex items-center gap-2 cursor-pointer text-black font-bold">
+              <input type="checkbox" class="style-active-toggle w-4 h-4 rounded accent-[#ffb703]" data-id="${style.id}" ${style.active ? 'checked' : ''}>
               <span>TAMPIL DI KIOSK</span>
             </label>
 
-            <button class="btn-make-default text-[11px] font-bold px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 transition-colors cursor-pointer" data-id="${style.id}">
+            <button class="btn-make-default text-[11px] font-bold px-3 py-1 rounded-lg bg-[#ebeae5] hover:bg-[#dadad6] border-2 border-black text-black transition-colors cursor-pointer shadow-[1px_1px_0px_#000]" data-id="${style.id}">
               ${style.isDefault ? '✓ AKTIF DEFAULT' : 'JADIKAN DEFAULT'}
             </button>
           </div>
@@ -988,35 +988,35 @@ class AdminApp {
       const imgUrl = item.fileUrl ? `${API_BASE}${item.fileUrl}` : '';
 
       return `
-        <div class="glass-panel rounded-2xl p-3.5 border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between shadow-lg">
-          <div class="flex items-center justify-between pb-2 border-b border-white/5 mb-2 font-mono text-xs">
-            <span class="font-bold text-blue-400">${item.sessionId}</span>
-            <span class="text-slate-500 text-[10px]">${item.printId}</span>
+        <div class="bg-white rounded-2xl p-3.5 border-2 border-black shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#ffb703] transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between pb-2 border-b border-black/10 mb-2 font-mono text-xs">
+            <span class="font-bold text-blue-700">${item.sessionId}</span>
+            <span class="text-gray-500 text-[10px]">${item.printId}</span>
           </div>
 
           <!-- Thermal Receipt Thumbnail Preview -->
-          <div class="w-full bg-black/50 rounded-xl p-2 flex justify-center items-center overflow-hidden h-64 cursor-pointer btn-open-lightbox border border-white/5 hover:border-white/20 transition-colors" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
+          <div class="w-full bg-[#ebeae5] border-2 border-black rounded-xl p-2 flex justify-center items-center overflow-hidden h-64 cursor-pointer btn-open-lightbox shadow-inner hover:bg-[#dadad6] transition-colors" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
             ${imgUrl ? `
-              <img src="${imgUrl}" alt="Strip" class="max-h-full object-contain rounded shadow-lg hover:scale-105 transition-transform duration-200">
+              <img src="${imgUrl}" alt="Strip" class="max-h-full object-contain rounded shadow-md hover:scale-105 transition-transform duration-200">
             ` : `
-              <div class="font-mono text-xs text-slate-500">No Image</div>
+              <div class="font-mono text-xs text-gray-500">No Image</div>
             `}
           </div>
 
           <div class="flex flex-col gap-1 my-2.5 font-mono text-xs">
-            <span class="font-bold truncate text-white uppercase">${frameName}</span>
-            <div class="flex justify-between text-[11px] text-slate-400">
+            <span class="font-bold truncate text-black uppercase">${frameName}</span>
+            <div class="flex justify-between text-[11px] text-gray-600 font-bold">
               <span>${filterName}</span>
               <span>${dateStr.split(' ')[1] || ''}</span>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 font-mono text-xs">
-            <button class="btn-open-lightbox h-8 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-bold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
+          <div class="grid grid-cols-2 gap-2 pt-2 border-t-2 border-black/10 font-mono text-xs">
+            <button class="btn-open-lightbox h-8 rounded-lg bg-white hover:bg-[#ebeae5] border-2 border-black text-[11px] font-bold text-black flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-[1px_1px_0px_#000]" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
               <span class="material-symbols-outlined text-[15px]">visibility</span>
               <span>LIHAT</span>
             </button>
-            <a href="${imgUrl}" download="${item.printId || 'thermal-print'}.png" class="h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-[11px] font-bold text-white flex items-center justify-center gap-1 transition-colors cursor-pointer">
+            <a href="${imgUrl}" download="${item.printId || 'thermal-print'}.png" class="h-8 rounded-lg bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black text-[11px] font-bold text-black flex items-center justify-center gap-1 transition-colors cursor-pointer shadow-[1px_1px_0px_#000]">
               <span class="material-symbols-outlined text-[15px]">download</span>
               <span>PNG</span>
             </a>
@@ -1112,11 +1112,11 @@ class AdminApp {
         const targetId = tab.getAttribute('data-cfg-tab');
 
         subtabs.forEach(t => {
-          t.classList.remove('border-cyan-400', 'text-cyan-400');
-          t.classList.add('border-transparent', 'text-slate-400');
+          t.classList.remove('border-2', 'border-black', 'border-b-0', 'bg-[#faf9f5]', 'text-black', '-mb-[2px]');
+          t.classList.add('border-2', 'border-transparent', 'text-gray-700');
         });
-        tab.classList.add('border-cyan-400', 'text-cyan-400');
-        tab.classList.remove('border-transparent', 'text-slate-400');
+        tab.classList.add('border-2', 'border-black', 'border-b-0', 'bg-[#faf9f5]', 'text-black', '-mb-[2px]');
+        tab.classList.remove('border-transparent', 'text-gray-700');
 
         document.querySelectorAll('.cfg-tab-content').forEach(content => {
           if (content.id === targetId) {

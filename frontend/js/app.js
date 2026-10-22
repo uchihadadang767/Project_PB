@@ -485,7 +485,7 @@ class KioskApp {
       proceedPrintBtn.addEventListener('click', async () => {
         window.kioskAudio.playSelect();
         proceedPrintBtn.disabled = true;
-        proceedPrintBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[24px]">progress_activity</span> RENDERING RECEIPT...';
+        proceedPrintBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[24px]">progress_activity</span> RENDERING THERMAL STRIP...';
 
         await this.generateCompositeReceipt();
         this.goToScreen('finish');
@@ -498,15 +498,33 @@ class KioskApp {
     const reprintBtn = document.getElementById('btn-reprint');
     if (reprintBtn) {
       reprintBtn.addEventListener('click', () => {
+        if (this.state.copiesPrinted >= 4) {
+          window.kioskAudio.playAlert();
+          reprintBtn.innerHTML = '<span class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-secondary-container">block</span> MAXIMUM 4 COPIES REACHED</span><span class="font-code-terminal text-label-md bg-secondary-container text-on-secondary-container px-space-sm py-1 font-bold">LIMIT</span>';
+          return;
+        }
+
         window.kioskAudio.playTap();
-        window.kioskAudio.playDispenseSound();
         this.state.copiesPrinted++;
         const copiesEl = document.getElementById('copies-printed-counter');
         if (copiesEl) copiesEl.textContent = `COPIES PRINTED: ${this.state.copiesPrinted} OF 4`;
-        reprintBtn.innerHTML = '<span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-secondary-container animate-ping"></span> DISPENSING COPY...</span><span class="font-code-terminal text-label-md bg-secondary-container text-on-secondary-container px-2 py-1 font-bold">+1 COPY</span>';
+
+        reprintBtn.disabled = true;
+        reprintBtn.innerHTML = `<span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-secondary-container animate-ping"></span> DISPENSING COPY #${this.state.copiesPrinted}...</span><span class="font-code-terminal text-label-md bg-secondary-container text-on-secondary-container px-2 py-1 font-bold">+1 COPY</span>`;
+
+        // Re-run the synchronized dispensing animation & auto-print for this copy
+        this.startFinishSequence({ isReprint: true });
+
         setTimeout(() => {
-          reprintBtn.innerHTML = '<span class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-secondary-container">print</span> PRINT ANOTHER COPY</span><span class="font-code-terminal text-label-md bg-secondary-container text-on-secondary-container px-space-sm py-1 font-bold">+1 COPY</span>';
-        }, 3000);
+          reprintBtn.disabled = false;
+          if (this.state.copiesPrinted < 4) {
+            reprintBtn.innerHTML = '<span class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-secondary-container">print</span> PRINT ANOTHER COPY</span><span class="font-code-terminal text-label-md bg-secondary-container text-on-secondary-container px-space-sm py-1 font-bold">+1 COPY</span>';
+          } else {
+            reprintBtn.innerHTML = '<span class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-secondary-container">done_all</span> ALL 4 COPIES PRINTED</span><span class="font-code-terminal text-label-md bg-surface-container text-on-surface px-space-sm py-1 font-bold">DONE</span>';
+            reprintBtn.classList.add('opacity-70');
+          }
+        }, 3400);
+
         this.resetAutoResetTimer();
       });
     }
@@ -1044,29 +1062,191 @@ class KioskApp {
     return dataUrl;
   }
 
-  startFinishSequence() {
-    window.kioskAudio.playDispenseSound();
+  // Auto-Print Direct to Connected Thermal Printer (80mm Thermal Receipt Paper Roll)
+  autoPrintThermalReceipt(receiptDataUrl) {
+    if (!receiptDataUrl) return;
 
+    try {
+      // Find or create hidden iframe dedicated to silent thermal printing
+      let iframe = document.getElementById('thermal-print-iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'thermal-print-iframe';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.style.opacity = '0';
+        iframe.style.pointerEvents = 'none';
+        iframe.style.zIndex = '-9999';
+        document.body.appendChild(iframe);
+      }
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Thermal Photo Strip - Order ${this.state.session.id}</title>
+  <style>
+    @page {
+      size: 80mm auto;
+      margin: 0mm !important;
+    }
+    @media print {
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 80mm !important;
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .thermal-receipt-strip {
+        width: 100% !important;
+        max-width: 80mm !important;
+        display: block !important;
+        margin: 0 auto !important;
+        image-rendering: -webkit-optimize-contrast !important;
+        image-rendering: pixelated !important;
+        image-rendering: crisp-edges !important;
+      }
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 80mm;
+      background: #ffffff;
+    }
+    .thermal-receipt-strip {
+      width: 100%;
+      max-width: 80mm;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <img id="print-receipt-img" class="thermal-receipt-strip" src="${receiptDataUrl}" alt="Thermal Strip" />
+  <script>
+    window.onload = function() {
+      var img = document.getElementById('print-receipt-img');
+      function triggerPrint() {
+        try {
+          window.focus();
+          window.print();
+        } catch(e) {
+          console.error('Iframe print call error:', e);
+        }
+      }
+      if (img && img.complete) {
+        setTimeout(triggerPrint, 80);
+      } else if (img) {
+        img.onload = function() {
+          setTimeout(triggerPrint, 80);
+        };
+      } else {
+        setTimeout(triggerPrint, 100);
+      }
+    };
+  <\/script>
+</body>
+</html>`);
+      doc.close();
+    } catch (err) {
+      console.warn('Silent thermal iframe print failed, falling back to window.print():', err);
+      try {
+        window.print();
+      } catch (e) {}
+    }
+  }
+
+  startFinishSequence({ isReprint = false } = {}) {
+    // 1. Elements
     const dispenserReceipt = document.getElementById('finish-dispensed-receipt');
+    const printMeter = document.getElementById('print-progress-meter');
+    const dispenseTag = document.getElementById('finish-dispense-tag');
+    const feedPulse = document.getElementById('feed-head-pulse');
+    const feedText = document.getElementById('feed-head-text');
+    const feedBadge = document.getElementById('feed-head-badge');
+    const statusTitle = document.getElementById('finish-status-title');
+    const statusSubtitle = document.getElementById('finish-status-subtitle');
+    const bannerPulse = document.getElementById('banner-pulse');
+    const bannerDot = document.getElementById('banner-dot');
+
+    // 2. Initial state: Dispensing active
+    if (dispenseTag) dispenseTag.textContent = isReprint ? 'DISPENSING COPY' : 'DISPENSING STRIP';
+    if (statusTitle) statusTitle.textContent = isReprint ? 'Printing Extra Photo Strip...' : 'Printing Your Photo Strip...';
+    if (statusSubtitle) statusSubtitle.textContent = 'Dispensing physical thermal roll below';
+    if (feedPulse) {
+      feedPulse.className = 'w-3 h-3 rounded-full bg-secondary-container animate-ping';
+    }
+    if (feedText) {
+      feedText.textContent = 'FEED HEAD: ACTIVE (80MM THERMAL MOTOR)';
+    }
+    if (feedBadge) {
+      feedBadge.textContent = 'DISPENSING...';
+      feedBadge.className = 'font-label-sm text-label-sm uppercase bg-primary text-on-primary px-space-xs py-0.5 font-bold transition-all';
+    }
+    if (bannerPulse) bannerPulse.className = 'absolute w-5 h-5 rounded-full bg-secondary-container/40 animate-ping';
+    if (bannerDot) bannerDot.className = 'w-3 h-3 rounded-full bg-secondary-container';
+
+    // 3. Trigger Dispenser Animation
     if (dispenserReceipt && this.state.finalReceiptImage) {
       dispenserReceipt.src = this.state.finalReceiptImage;
-      dispenserReceipt.classList.remove('dispensing-animation');
+      dispenserReceipt.classList.remove('dispensing-animation', 'paper-cut-snapped');
       void dispenserReceipt.offsetWidth; // Trigger reflow
       dispenserReceipt.classList.add('dispensing-animation');
     }
 
-    // Print progress meter
-    const printMeter = document.getElementById('print-progress-meter');
+    // 4. Audio stepper motor feed sound with completion cutter snip
+    window.kioskAudio.playDispenseSound();
+
+    // 5. Trigger Auto Print synchronized with paper emergence (~350ms delay)
+    // In kiosk mode (--kiosk-printing), this silently feeds paper in real-time with the UI!
+    setTimeout(() => {
+      this.autoPrintThermalReceipt(this.state.finalReceiptImage);
+    }, 350);
+
+    // 6. Smooth progress meter (0% -> 100% over 3.2 seconds)
+    if (this.finishProgressTimer) {
+      clearInterval(this.finishProgressTimer);
+    }
+
     let pct = 0;
-    const progressInterval = setInterval(() => {
+    this.finishProgressTimer = setInterval(() => {
       pct += 10;
-      if (pct <= 100) {
+      if (pct < 100) {
         if (printMeter) printMeter.textContent = `PRINTING: ${pct}% COMPLETE`;
       } else {
-        clearInterval(progressInterval);
+        clearInterval(this.finishProgressTimer);
+        this.finishProgressTimer = null;
         if (printMeter) printMeter.textContent = 'PRINTING: 100% DISPENSED [COLLECT BELOW]';
+
+        // 7. Dispense Completion: Cutter snap & ready status
+        if (dispenserReceipt) {
+          dispenserReceipt.classList.add('paper-cut-snapped');
+        }
+        if (dispenseTag) dispenseTag.textContent = 'STRIP DISPENSED [OK]';
+        if (statusTitle) statusTitle.textContent = 'PHOTO STRIP DISPENSED!';
+        if (statusSubtitle) statusSubtitle.textContent = 'Physical thermal strip ready to collect below';
+        if (feedPulse) {
+          feedPulse.className = 'w-3 h-3 rounded-full bg-emerald-500 inline-block';
+        }
+        if (feedText) {
+          feedText.textContent = 'FEED HEAD: IDLE • PAPER CUT COMPLETED';
+        }
+        if (feedBadge) {
+          feedBadge.textContent = 'READY TO COLLECT';
+          feedBadge.className = 'font-label-sm text-label-sm uppercase bg-secondary-container text-on-secondary-container px-space-xs py-0.5 font-bold transition-all';
+        }
+        if (bannerPulse) bannerPulse.className = 'hidden';
+        if (bannerDot) bannerDot.className = 'w-3 h-3 rounded-full bg-emerald-400';
       }
-    }, 300);
+    }, 320);
 
     this.resetAutoResetTimer();
   }

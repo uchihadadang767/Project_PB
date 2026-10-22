@@ -113,25 +113,54 @@ class KioskAudioEngine {
   }
 
   // Thermal Printer Paper Dispensing Sound (Simulated Stepper Motor)
-  playDispenseSound() {
-    if (this.isMuted) return;
+  playDispenseSound(onComplete) {
+    if (this.isMuted) {
+      if (typeof onComplete === 'function') setTimeout(onComplete, 3200);
+      return;
+    }
     this.init();
-    if (!this.ctx) return;
+    if (!this.ctx) {
+      if (typeof onComplete === 'function') setTimeout(onComplete, 3200);
+      return;
+    }
 
     let steps = 0;
     const interval = setInterval(() => {
       steps++;
-      // Subtle stepper tick
-      this.playTone(200 + (steps % 3) * 60, 'sawtooth', 0.03, 0.08);
-      if (steps > 25) {
+      // Subtle stepper tick with varying frequency
+      this.playTone(200 + (steps % 3) * 60, 'sawtooth', 0.03, 0.09);
+      if (steps >= 25) {
         clearInterval(interval);
-        // Finishing chime
-        setTimeout(() => {
-          this.playTone(659.25, 'sine', 0.1, 0.15);
-          setTimeout(() => this.playTone(880, 'sine', 0.2, 0.15), 100);
-        }, 150);
+        // Play guillotine paper cut & pleasant chime
+        this.playPaperCut();
+        if (typeof onComplete === 'function') {
+          setTimeout(onComplete, 150);
+        }
       }
     }, 120);
+  }
+
+  // Guillotine Auto-Cutter Mechanical Snip & Chime
+  playPaperCut() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      // 1. Mechanical guillotine blade click / snap
+      this.playTone(1600, 'sawtooth', 0.03, 0.22);
+      setTimeout(() => {
+        this.playTone(480, 'square', 0.05, 0.2);
+      }, 25);
+
+      // 2. Clear pleasant ready chime (C6 -> E6)
+      setTimeout(() => {
+        this.playTone(1046.5, 'sine', 0.12, 0.18);
+        setTimeout(() => this.playTone(1318.51, 'sine', 0.22, 0.18), 110);
+      }, 140);
+    } catch (e) {
+      this.playTone(880, 'sine', 0.15, 0.2);
+    }
   }
 
   // Error or Alert Buzz
@@ -141,3 +170,4 @@ class KioskAudioEngine {
 }
 
 window.kioskAudio = new KioskAudioEngine();
+

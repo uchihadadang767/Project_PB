@@ -148,12 +148,22 @@ body {
 /* Printer Slot Dispense Animation */
 @keyframes dispenseSlide {
   0% {
-    transform: translateY(-85%);
-    opacity: 0.6;
+    transform: translateY(-100%);
+    opacity: 0.2;
+    filter: brightness(0.85);
   }
-  50% {
-    transform: translateY(-40%);
-    opacity: 0.9;
+  15% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  30% {
+    transform: translateY(-68%);
+  }
+  60% {
+    transform: translateY(-32%);
+  }
+  85% {
+    transform: translateY(-8%);
   }
   100% {
     transform: translateY(0);
@@ -162,7 +172,20 @@ body {
 }
 
 .dispensing-animation {
-  animation: dispenseSlide 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation: dispenseSlide 3.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  will-change: transform;
+}
+
+/* Guillotine Cutter Snap Animation (Mechanical paper cut bounce) */
+@keyframes cutterSnap {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(6px); }
+  70% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+.paper-cut-snapped {
+  animation: cutterSnap 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Laser Scanner Beam */
@@ -211,4 +234,101 @@ body {
 .modal-backdrop {
   background-color: rgba(18, 18, 18, 0.75);
   backdrop-filter: blur(2px);
+}
+
+/* ==========================================================================
+   Thermal Receipt Print Layout (Standard 80mm Roll - Zero Margins)
+   ========================================================================== */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0mm !important;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 80mm !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide all UI elements, modals, nav bars, buttons, countdowns during print */
+  header,
+  footer,
+  #screen-welcome,
+  #screen-frame,
+  #screen-payment,
+  #screen-camera,
+  #screen-customize,
+  #screen-finish .lg\:col-span-5,
+  #screen-finish > div:first-child,
+  #screen-finish .w-full.bg-primary-container,
+  #screen-finish .font-label-sm,
+  #screen-finish .relative.w-full.h-8,
+  #screen-finish .relative.w-full.h-9,
+  #feed-head-status-box,
+  #countdown-modal,
+  #camera-flash-overlay,
+  .kiosk-screen:not(#screen-finish),
+  button {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Only display the dispensed thermal receipt image */
+  #screen-finish {
+    display: block !important;
+    opacity: 1 !important;
+    transform: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 80mm !important;
+  }
+
+  #screen-finish .lg\:col-span-7 {
+    display: block !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #screen-finish .bg-inverse-surface {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+  }
+
+  #dispenser-paper-stage,
+  #screen-finish .w-full.flex.justify-center {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-height: none !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  #finish-dispensed-receipt {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    image-rendering: -webkit-optimize-contrast !important;
+    image-rendering: pixelated !important;
+    image-rendering: crisp-edges !important;
+  }
 }

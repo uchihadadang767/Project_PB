@@ -992,17 +992,17 @@
         <div class="w-full bg-primary-container text-on-primary p-space-md shadow-brutal border-2 border-primary flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md">
           <div class="flex items-center gap-space-md">
             <div class="relative flex items-center justify-center w-6 h-6">
-              <span class="absolute w-5 h-5 rounded-full bg-secondary-container/40 animate-ping"></span>
-              <span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+              <span id="banner-pulse" class="absolute w-5 h-5 rounded-full bg-secondary-container/40 animate-ping"></span>
+              <span id="banner-dot" class="w-3 h-3 rounded-full bg-secondary-container"></span>
             </div>
             <div class="flex flex-col">
-              <span class="font-headline-md text-headline-md uppercase tracking-tight text-surface-bright flex items-center gap-2 font-bold">Printing Your Photo Strip...</span>
-              <span class="font-label-sm text-label-sm text-secondary-container uppercase tracking-wider font-bold">Dispensing physical thermal roll below</span>
+              <span id="finish-status-title" class="font-headline-md text-headline-md uppercase tracking-tight text-surface-bright flex items-center gap-2 font-bold">Printing Your Photo Strip...</span>
+              <span id="finish-status-subtitle" class="font-label-sm text-label-sm text-secondary-container uppercase tracking-wider font-bold">Dispensing physical thermal roll below</span>
             </div>
           </div>
           <div class="flex items-center gap-space-sm bg-surface-container-highest/10 px-space-md py-space-xs border border-primary">
             <span class="material-symbols-outlined text-secondary-container text-[18px]">print</span>
-            <span id="print-progress-meter" class="font-code-terminal text-code-terminal text-surface-bright">ESTIMATED TIME: ~3s</span>
+            <span id="print-progress-meter" class="font-code-terminal text-code-terminal text-surface-bright">PRINTING: 0% INITIALIZING...</span>
           </div>
         </div>
 
@@ -1015,28 +1015,30 @@
                 <span class="flex items-center gap-1 font-code-terminal">
                   <span class="material-symbols-outlined text-[14px] text-tertiary-fixed-dim">print</span> THERMAL PRINTER SLOT
                 </span>
-                <span class="font-code-terminal text-tertiary-fixed-dim font-bold">DISPENSING STRIP</span>
+                <span id="finish-dispense-tag" class="font-code-terminal text-tertiary-fixed-dim font-bold">DISPENSING STRIP</span>
               </div>
 
               <!-- Guillotine Slot -->
-              <div class="relative w-full h-8 bg-primary overflow-hidden shadow-inner flex items-center justify-center px-space-sm border border-primary">
-                <div class="absolute inset-x-0 h-1.5 bg-black/90 top-1/2 -translate-y-1/2"></div>
-                <div class="z-10 font-label-sm text-label-sm text-surface-dim tracking-widest uppercase font-bold">
-                  /// 80MM PRINTER DISPENSE SLOT ///
+              <div class="relative z-30 w-full h-9 bg-primary overflow-hidden shadow-md flex items-center justify-center px-space-sm border-2 border-primary">
+                <div class="absolute inset-x-0 h-2 bg-black top-1/2 -translate-y-1/2 shadow-inner border-y border-neutral-800"></div>
+                <div class="z-10 font-code-terminal text-[11px] text-surface-dim tracking-widest uppercase font-bold flex items-center gap-2">
+                  <span id="slot-led-left" class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse inline-block"></span>
+                  <span>/// 80MM PRINTER DISPENSE SLOT ///</span>
+                  <span id="slot-led-right" class="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse inline-block"></span>
                 </div>
               </div>
 
               <!-- Emerging Printed Receipt -->
-              <div class="w-full flex justify-center -mt-1 relative z-20 overflow-hidden">
+              <div id="dispenser-paper-stage" class="w-full flex justify-center -mt-2 relative z-20 overflow-hidden pt-2 min-h-[360px] max-h-[500px]">
                 <img id="finish-dispensed-receipt" class="w-72 sm:w-80 shadow-2xl border-2 border-primary bg-white dispensing-animation" alt="Dispensed Thermal Receipt Strip" src="">
               </div>
 
-              <div class="w-full bg-surface-container-high text-primary p-space-sm mt-space-md shadow-md border border-primary flex items-center justify-between">
+              <div id="feed-head-status-box" class="w-full bg-surface-container-high text-primary p-space-sm mt-space-md shadow-md border border-primary flex items-center justify-between">
                 <div class="flex items-center gap-space-sm">
-                  <span class="w-3 h-3 rounded-full bg-tertiary-fixed-dim animate-ping"></span>
-                  <span class="font-code-terminal text-code-terminal font-bold">FEED HEAD: ACTIVE</span>
+                  <span id="feed-head-pulse" class="w-3 h-3 rounded-full bg-secondary-container animate-ping"></span>
+                  <span id="feed-head-text" class="font-code-terminal text-code-terminal font-bold">FEED HEAD: ACTIVE (80MM MOTOR)</span>
                 </div>
-                <span class="font-label-sm text-label-sm uppercase bg-primary text-on-primary px-space-xs py-0.5 font-bold">READY TO COLLECT</span>
+                <span id="feed-head-badge" class="font-label-sm text-label-sm uppercase bg-primary text-on-primary px-space-xs py-0.5 font-bold transition-all">DISPENSING...</span>
               </div>
             </div>
           </div>

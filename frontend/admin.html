@@ -6,10 +6,10 @@
   <title>Admin Dashboard | Thermal Photobooth Kiosk</title>
   <meta name="description" content="Manage your photobooth kiosk, live payment approval queues, frames, photo styles, and photo archives.">
 
-  <!-- Google Fonts: Plus Jakarta Sans & Space Mono -->
+  <!-- Google Fonts: Space Grotesk, Space Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
@@ -20,17 +20,17 @@
       theme: {
         extend: {
           colors: {
-            "dark-bg": "#060913",
-            "dark-card": "#0c1322",
-            "dark-border": "#1b263b",
-            "accent-cyan": "#00f0ff",
-            "accent-amber": "#ffaa00",
-            "accent-purple": "#a855f7",
-            "accent-emerald": "#10b981",
-            "accent-blue": "#3b82f6"
+            "surface": "#faf9f5",
+            "surface-low": "#f4f4f0",
+            "surface-container": "#ebeae5",
+            "surface-dim": "#dadad6",
+            "primary": "#121212",
+            "accent-amber": "#ffb703",
+            "accent-amber-light": "#ffc83b"
           },
           fontFamily: {
-            "sans": ["'Plus Jakarta Sans'", "sans-serif"],
+            "sans": ["'Space Grotesk'", "sans-serif"],
+            "display": ["'Space Grotesk'", "sans-serif"],
             "mono": ["'Space Mono'", "monospace"]
           }
         }
@@ -39,75 +39,64 @@
   </script>
 
   <style>
-    /* Custom Sleek Dark Theme Styles */
+    /* Thermal Brutalism Theme Styles (Matching User Kiosk Palette) */
+    :root {
+      --surface: #faf9f5;
+      --surface-low: #f4f4f0;
+      --surface-container: #ebeae5;
+      --surface-dim: #dadad6;
+      --primary: #121212;
+      --accent-amber: #ffb703;
+    }
+
     body {
-      background-color: #060913;
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.22), transparent 45%),
-        radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.08), transparent 35%),
-        radial-gradient(circle at 80% 40%, rgba(6, 182, 212, 0.08), transparent 35%);
-      color: #f1f5f9;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #faf9f5;
+      background-image: radial-gradient(rgba(18, 18, 18, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: #121212;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
-    /* Glow Icons */
-    .glow-orange {
-      background: linear-gradient(135deg, #f59e0b, #ea580c);
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.45), 0 0 45px rgba(234, 88, 12, 0.25);
-    }
-    .glow-blue {
-      background: linear-gradient(135deg, #3b82f6, #4f46e5);
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.45), 0 0 45px rgba(79, 70, 229, 0.25);
-    }
-    .glow-purple {
-      background: linear-gradient(135deg, #a855f7, #7c3aed);
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.45), 0 0 45px rgba(124, 58, 237, 0.25);
-    }
-    .glow-green {
-      background: linear-gradient(135deg, #10b981, #0d9488);
-      box-shadow: 0 0 25px rgba(16, 185, 129, 0.45), 0 0 45px rgba(13, 148, 136, 0.25);
-    }
-    .glow-cyan {
-      background: linear-gradient(135deg, #06b6d4, #0284c7);
-      box-shadow: 0 0 25px rgba(6, 182, 212, 0.45), 0 0 45px rgba(2, 132, 199, 0.25);
-    }
-
-    /* Glass Cards */
+    /* Mechanical Brutalism Cards */
     .dashboard-nav-card {
-      background: rgba(13, 19, 34, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      transition: all 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+      background: #ffffff;
+      border: 2px solid #121212;
+      box-shadow: 4px 4px 0px #121212;
+      transition: all 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .dashboard-nav-card:hover {
-      border-color: rgba(255, 255, 255, 0.25);
-      transform: translateY(-6px);
-      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7);
+      transform: translateY(-4px);
+      box-shadow: 6px 6px 0px #ffb703;
+      border-color: #121212;
+    }
+
+    .dashboard-nav-card:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #121212;
     }
 
     .glass-panel {
-      background: rgba(12, 19, 34, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: #ffffff;
+      border: 2px solid #121212;
+      box-shadow: 4px 4px 0px #121212;
     }
 
-    /* Dark Mode Custom Scrollbar */
+    /* Brutalist Custom Scrollbar */
     ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #080d1a;
+      background: #dadad6;
+      border-left: 2px solid #121212;
     }
     ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 4px;
+      background: #121212;
+      border: 1px solid #faf9f5;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
+      background: #ffb703;
     }
 
     /* Laser Scanner Beam */
@@ -121,65 +110,65 @@
       left: 6px;
       right: 6px;
       height: 2px;
-      background-color: #00f0ff;
-      box-shadow: 0 0 12px #00f0ff, 0 0 4px #ffffff;
+      background-color: #ffb703;
+      box-shadow: 0 0 10px #ffb703, 0 0 3px #121212;
       animation: darkLaser 2.2s ease-in-out infinite;
     }
   </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+<body class="min-h-screen text-[#121212] flex flex-col justify-between selection:bg-[#ffb703] selection:text-black">
 
   <!-- =========================================================================
-       TOP NAVIGATION BAR
+       TOP NAVIGATION BAR (THERMAL BRUTALISM)
        ========================================================================= -->
-  <nav class="w-full border-b border-white/5 bg-[#070b14]/75 backdrop-blur-md sticky top-0 z-40">
+  <nav class="w-full border-b-2 border-black bg-[#f4f4f0] sticky top-0 z-40">
     <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
       
       <!-- Brand & Status Telemetry -->
       <div class="flex items-center gap-3">
         <a href="/admin" class="flex items-center gap-2.5 group">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-extrabold text-sm shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+          <div class="w-9 h-9 rounded-xl bg-[#ffb703] border-2 border-black flex items-center justify-center font-mono font-bold text-sm text-black shadow-[2px_2px_0px_#000] group-hover:scale-105 transition-transform">
             TB
           </div>
           <div class="flex flex-col">
             <div class="flex items-center gap-2">
-              <span class="text-base font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">Thermal Photobooth</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">ADMIN</span>
+              <span class="text-base font-bold font-display tracking-tight text-black group-hover:text-amber-600 transition-colors">Thermal Photobooth</span>
+              <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-black text-[#ffb703] border border-black font-bold shadow-[1px_1px_0px_#000]">ADMIN</span>
             </div>
-            <span class="text-[11px] text-slate-400 font-mono hidden sm:inline">STATION-A9 • DIRECT THERMAL 80MM</span>
+            <span class="text-[11px] text-gray-600 font-mono hidden sm:inline">STATION-A9 • DIRECT THERMAL 80MM</span>
           </div>
         </a>
 
-        <div class="hidden xl:flex items-center gap-2.5 pl-4 border-l border-white/10 text-xs font-mono text-slate-400">
-          <span class="flex items-center gap-1.5 text-emerald-400">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE
+        <div class="hidden xl:flex items-center gap-2.5 pl-4 border-l-2 border-black/20 text-xs font-mono text-gray-700">
+          <span class="flex items-center gap-1.5 text-emerald-700 font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span> ONLINE
           </span>
           <span>•</span>
           <span id="hardware-status-text">HEAD: OK (38°C)</span>
           <span>•</span>
-          <span>ROLL: <strong class="text-white">94%</strong></span>
+          <span>ROLL: <strong class="text-black">94%</strong></span>
         </div>
       </div>
 
       <!-- Quick Actions & Clock -->
       <div class="flex items-center gap-3">
-        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 font-mono text-xs text-slate-300">
-          <span class="material-symbols-outlined text-[15px] text-amber-400">alarm</span>
+        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border-2 border-black font-mono text-xs text-black shadow-[2px_2px_0px_#000]">
+          <span class="material-symbols-outlined text-[15px] text-[#ffb703]">alarm</span>
           <span id="admin-clock">12:00:00 PM</span>
         </div>
 
-        <button id="btn-sound-toggle" class="h-9 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1.5 text-xs font-mono text-slate-300 transition-colors cursor-pointer" type="button" title="Toggle Sound Chimes">
-          <span id="sound-icon" class="material-symbols-outlined text-[18px] text-amber-400">volume_up</span>
+        <button id="btn-sound-toggle" class="h-9 px-3 rounded-xl bg-white hover:bg-[#ebeae5] border-2 border-black flex items-center gap-1.5 text-xs font-mono text-black transition-colors cursor-pointer shadow-[2px_2px_0px_#000]" type="button" title="Toggle Sound Chimes">
+          <span id="sound-icon" class="material-symbols-outlined text-[18px] text-black">volume_up</span>
           <span id="sound-text" class="hidden sm:inline">CHIME ON</span>
         </button>
 
         <!-- Tombol Konfigurasi (.env & System) -->
-        <button id="btn-open-config" class="h-9 px-3.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-500/50 flex items-center gap-2 text-xs font-mono font-bold text-slate-200 hover:text-white transition-all cursor-pointer group shadow-sm" type="button" title="Buka Konfigurasi Sistem & Environment (.env)">
-          <span class="material-symbols-outlined text-[18px] text-cyan-400 group-hover:rotate-90 transition-transform duration-300">tune</span>
+        <button id="btn-open-config" class="h-9 px-3.5 rounded-xl bg-[#ebeae5] hover:bg-[#dadad6] border-2 border-black flex items-center gap-2 text-xs font-mono font-bold text-black transition-all cursor-pointer group shadow-[2px_2px_0px_#000]" type="button" title="Buka Konfigurasi Sistem & Environment (.env)">
+          <span class="material-symbols-outlined text-[18px] text-black group-hover:rotate-90 transition-transform duration-300">tune</span>
           <span class="tracking-wide">KONFIGURASI</span>
         </button>
 
-        <a href="/" target="_blank" class="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.35)] flex items-center gap-2 text-xs font-bold text-white transition-all cursor-pointer">
+        <a href="/" target="_blank" class="h-9 px-4 rounded-xl bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black text-black font-mono font-black shadow-[3px_3px_0px_#000] flex items-center gap-2 text-xs transition-all cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
           <span>BUKA KIOSK</span>
           <span class="material-symbols-outlined text-[16px]">open_in_new</span>
         </a>
@@ -193,93 +182,79 @@
   <main class="max-w-[1440px] mx-auto px-4 sm:px-8 py-8 w-full flex-1 flex flex-col justify-center">
 
     <!-- Toast Notification Banner -->
-    <div id="admin-toast" class="fixed bottom-6 right-6 z-50 glass-panel border border-blue-500/40 text-white rounded-xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.8)] flex items-center gap-3 font-mono text-sm transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-none">
-      <span id="toast-icon" class="material-symbols-outlined text-blue-400 text-[22px]">check_circle</span>
+    <div id="admin-toast" class="fixed bottom-6 right-6 z-50 bg-white border-2 border-black text-black rounded-xl p-4 shadow-[4px_4px_0px_#000] flex items-center gap-3 font-mono text-sm transition-all duration-300 transform translate-y-24 opacity-0 pointer-events-none">
+      <span id="toast-icon" class="material-symbols-outlined text-emerald-600 text-[22px]">check_circle</span>
       <span id="toast-msg">Settings saved successfully</span>
     </div>
 
     <!-- -----------------------------------------------------------------------
-         VIEW 1: CLEAN 5-BUTTON DASHBOARD (DEFAULT / EXACT LIKE SCREENSHOT)
+         VIEW 1: CLEAN 5-BUTTON DASHBOARD (CLEAN MINIMAL BUTTONS ONLY)
          ----------------------------------------------------------------------- -->
     <div id="view-dashboard" class="flex flex-col justify-center min-h-[calc(100vh-14rem)] py-8">
       
-      <!-- Title & Subtitle Centered -->
-      <div class="text-center mb-12">
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-3">
+      <!-- Title Centered (Clean, No paragraph) -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#ebeae5] border-2 border-black font-mono text-[11px] text-black font-bold mb-3 tracking-wider shadow-[2px_2px_0px_#000]">
+          <span class="w-2 h-2 rounded-full bg-[#ffb703] border border-black inline-block animate-pulse"></span>
+          <span>STATION CONTROL PANEL</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-display text-black">
           Admin Dashboard
         </h1>
-        <p class="text-slate-400 text-sm sm:text-base max-w-xl mx-auto font-normal">
-          Manage your photobooth kiosk, payout & QR payment, frame layouts, and photo archives
-        </p>
       </div>
 
-      <!-- The 5 Glowing Squircle Cards Row (Clean Only) -->
+      <!-- The 5 Glowing Squircle Cards Row (Clean Minimal Buttons Only, No text inside field) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 max-w-6xl mx-auto w-full">
         
-        <!-- Card 1: Persetujuan Payout / Orderan (Orange Glow) -->
-        <div class="dashboard-nav-card rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer group" data-tab="tab-orders">
-          <div class="w-14 h-14 rounded-2xl glow-orange flex items-center justify-center text-white mb-4 group-hover:scale-105 transition-transform relative">
+        <!-- Card 1: Persetujuan Order -->
+        <div class="dashboard-nav-card rounded-2xl p-6 sm:py-8 flex flex-col items-center justify-center text-center cursor-pointer group" data-tab="tab-orders">
+          <div class="w-14 h-14 rounded-2xl bg-[#ffb703] border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black mb-3 group-hover:scale-105 transition-transform relative">
             <span class="material-symbols-outlined text-[28px]">payments</span>
-            <span id="badge-pending-orders" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#0c1322] hidden">0</span>
+            <span id="badge-pending-orders" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-black hidden">0</span>
           </div>
-          <h3 class="text-white font-bold text-base tracking-tight mb-2 group-hover:text-amber-400 transition-colors">
+          <h3 class="text-black font-display font-bold text-base tracking-tight group-hover:text-amber-600 transition-colors">
             Persetujuan Order
           </h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Validasi & ACC sesi bayar QRIS/Cash, buka kamera instan, dan pantau antrean order.
-          </p>
         </div>
 
-        <!-- Card 2: Pengaturan Tarif & QR Payment (Blue Glow) -->
-        <div class="dashboard-nav-card rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer group" data-tab="tab-qr">
-          <div class="w-14 h-14 rounded-2xl glow-blue flex items-center justify-center text-white mb-4 group-hover:scale-105 transition-transform">
+        <!-- Card 2: Pengaturan Tarif & QR Payment -->
+        <div class="dashboard-nav-card rounded-2xl p-6 sm:py-8 flex flex-col items-center justify-center text-center cursor-pointer group" data-tab="tab-qr">
+          <div class="w-14 h-14 rounded-2xl bg-[#38bdf8] border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black mb-3 group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[28px]">qr_code_2</span>
           </div>
-          <h3 class="text-white font-bold text-base tracking-tight mb-2 group-hover:text-blue-400 transition-colors">
+          <h3 class="text-black font-display font-bold text-base tracking-tight group-hover:text-amber-600 transition-colors">
             QR & Tarif
           </h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Upload foto QRIS merchant, ganti NMID toko, dan atur tarif per sesi foto booth.
-          </p>
         </div>
 
-        <!-- Card 3: Kelola Frame Kiosk (Purple Glow) -->
-        <div class="dashboard-nav-card rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer group" data-tab="tab-frames">
-          <div class="w-14 h-14 rounded-2xl glow-purple flex items-center justify-center text-white mb-4 group-hover:scale-105 transition-transform">
+        <!-- Card 3: Kelola Frame Kiosk -->
+        <div class="dashboard-nav-card rounded-2xl p-6 sm:py-8 flex flex-col items-center justify-center text-center cursor-pointer group" data-tab="tab-frames">
+          <div class="w-14 h-14 rounded-2xl bg-[#c084fc] border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black mb-3 group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[28px]">grid_view</span>
           </div>
-          <h3 class="text-white font-bold text-base tracking-tight mb-2 group-hover:text-purple-400 transition-colors">
+          <h3 class="text-black font-display font-bold text-base tracking-tight group-hover:text-amber-600 transition-colors">
             Kelola Frame
           </h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Tambah template layout (3-cut, 4-cut grid), atur jumlah pose, aspect ratio & promo badge.
-          </p>
         </div>
 
-        <!-- Card 4: Photo Styles & Dither (Green Glow) -->
-        <div class="dashboard-nav-card rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer group" data-tab="tab-styles">
-          <div class="w-14 h-14 rounded-2xl glow-green flex items-center justify-center text-white mb-4 group-hover:scale-105 transition-transform">
+        <!-- Card 4: Photo Styles & Dither -->
+        <div class="dashboard-nav-card rounded-2xl p-6 sm:py-8 flex flex-col items-center justify-center text-center cursor-pointer group" data-tab="tab-styles">
+          <div class="w-14 h-14 rounded-2xl bg-[#4ade80] border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black mb-3 group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[28px]">auto_fix_high</span>
           </div>
-          <h3 class="text-white font-bold text-base tracking-tight mb-2 group-hover:text-emerald-400 transition-colors">
+          <h3 class="text-black font-display font-bold text-base tracking-tight group-hover:text-amber-600 transition-colors">
             Photo Styles
           </h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Algoritma dithering 1-bit Bayer, Atkinson, Floyd-Steinberg, dan slider kontras thermal.
-          </p>
         </div>
 
-        <!-- Card 5: Data Foto & Arsip (Cyan Glow) -->
-        <div class="dashboard-nav-card rounded-2xl p-6 flex flex-col items-center text-center cursor-pointer group" data-tab="tab-photos">
-          <div class="w-14 h-14 rounded-2xl glow-cyan flex items-center justify-center text-white mb-4 group-hover:scale-105 transition-transform">
+        <!-- Card 5: Data Foto & Arsip -->
+        <div class="dashboard-nav-card rounded-2xl p-6 sm:py-8 flex flex-col items-center justify-center text-center cursor-pointer group" data-tab="tab-photos">
+          <div class="w-14 h-14 rounded-2xl bg-[#2dd4bf] border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black mb-3 group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[28px]">photo_library</span>
           </div>
-          <h3 class="text-white font-bold text-base tracking-tight mb-2 group-hover:text-cyan-400 transition-colors">
+          <h3 class="text-black font-display font-bold text-base tracking-tight group-hover:text-amber-600 transition-colors">
             Data Foto & Arsip
           </h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Galeri hasil cetak strip 80mm tiap sesi, unduh PNG master, dan re-print struk.
-          </p>
         </div>
 
       </div>
@@ -290,22 +265,21 @@
          VIEW 2: DEDICATED MODULE PAGE (SHOWN ONLY WHEN A BUTTON IS CLICKED)
          ----------------------------------------------------------------------- -->
     <div id="view-module-page" class="hidden flex-col w-full py-4">
-      
       <!-- Top Header with Back to Dashboard Button -->
-      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8">
-        <button id="btn-back-to-dashboard" class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono font-bold text-slate-300 hover:text-white transition-all cursor-pointer group">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b-2 border-black mb-8">
+        <button id="btn-back-to-dashboard" class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white hover:bg-[#ebeae5] border-2 border-black text-xs font-mono font-bold text-black transition-all shadow-[2px_2px_0px_#000] cursor-pointer group active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
           <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
           <span>KEMBALI KE DASHBOARD</span>
         </button>
 
         <!-- Active Module Indicator & Title -->
         <div class="flex items-center gap-3">
-          <div id="module-page-icon" class="w-10 h-10 rounded-xl glow-orange flex items-center justify-center text-white">
+          <div id="module-page-icon" class="w-10 h-10 rounded-xl bg-[#ffb703] border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black">
             <span class="material-symbols-outlined text-[20px]">payments</span>
           </div>
           <div>
-            <h2 id="module-page-title" class="text-lg font-bold text-white leading-tight">Persetujuan Order & Payment</h2>
-            <span id="module-page-desc" class="text-xs text-slate-400">Validasi & ACC sesi bayar QRIS/Cash secara real-time</span>
+            <h2 id="module-page-title" class="text-lg font-bold font-display text-black leading-tight">Persetujuan Order & Payment</h2>
+            <span id="module-page-desc" class="text-xs text-gray-600 font-mono">Validasi & ACC sesi bayar QRIS/Cash secara real-time</span>
           </div>
         </div>
       </div>
@@ -315,64 +289,64 @@
         
         <!-- Metrics Row -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="glass-panel rounded-2xl p-5 border border-white/5 flex items-center justify-between">
+          <div class="bg-white rounded-2xl p-5 border-2 border-black shadow-[3px_3px_0px_#000] flex items-center justify-between">
             <div>
-              <span class="text-xs font-mono text-slate-400 uppercase">MENUNGGU ACC (PENDING)</span>
-              <div id="stat-pending-count" class="text-3xl font-extrabold text-amber-400 mt-1">0</div>
+              <span class="text-xs font-mono text-gray-600 uppercase font-bold">MENUNGGU ACC (PENDING)</span>
+              <div id="stat-pending-count" class="text-3xl font-extrabold text-[#d97706] mt-1 font-display">0</div>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-[#ffb703] border-2 border-black shadow-[2px_2px_0px_#000] text-black flex items-center justify-center">
               <span class="material-symbols-outlined text-[26px] animate-pulse">hourglass_top</span>
             </div>
           </div>
 
-          <div class="glass-panel rounded-2xl p-5 border border-white/5 flex items-center justify-between">
+          <div class="bg-white rounded-2xl p-5 border-2 border-black shadow-[3px_3px_0px_#000] flex items-center justify-between">
             <div>
-              <span class="text-xs font-mono text-slate-400 uppercase">TOTAL OMZET HARI INI</span>
-              <div id="stat-today-revenue" class="text-2xl font-extrabold text-emerald-400 mt-1">Rp 0</div>
+              <span class="text-xs font-mono text-gray-600 uppercase font-bold">TOTAL OMZET HARI INI</span>
+              <div id="stat-today-revenue" class="text-2xl font-extrabold text-[#059669] mt-1 font-display">Rp 0</div>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-[#4ade80] border-2 border-black shadow-[2px_2px_0px_#000] text-black flex items-center justify-center">
               <span class="material-symbols-outlined text-[26px]">account_balance_wallet</span>
             </div>
           </div>
 
-          <div class="glass-panel rounded-2xl p-5 border border-white/5 flex items-center justify-between">
+          <div class="bg-white rounded-2xl p-5 border-2 border-black shadow-[3px_3px_0px_#000] flex items-center justify-between">
             <div>
-              <span class="text-xs font-mono text-slate-400 uppercase">SESI CETAK HARI INI</span>
-              <div id="stat-today-sessions" class="text-3xl font-extrabold text-white mt-1">0</div>
+              <span class="text-xs font-mono text-gray-600 uppercase font-bold">SESI CETAK HARI INI</span>
+              <div id="stat-today-sessions" class="text-3xl font-extrabold text-black mt-1 font-display">0</div>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-[#38bdf8] border-2 border-black shadow-[2px_2px_0px_#000] text-black flex items-center justify-center">
               <span class="material-symbols-outlined text-[26px]">receipt_long</span>
             </div>
           </div>
 
-          <div class="glass-panel rounded-2xl p-5 border border-white/5 flex items-center justify-between">
+          <div class="bg-white rounded-2xl p-5 border-2 border-black shadow-[3px_3px_0px_#000] flex items-center justify-between">
             <div>
-              <span class="text-xs font-mono text-slate-400 uppercase">MODE ACC KIOSK</span>
-              <div id="stat-payment-mode" class="text-sm font-bold text-white mt-1">MANUAL OPERATOR ACC</div>
+              <span class="text-xs font-mono text-gray-600 uppercase font-bold">MODE ACC KIOSK</span>
+              <div id="stat-payment-mode" class="text-sm font-bold text-black mt-1">MANUAL OPERATOR ACC</div>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-[#c084fc] border-2 border-black shadow-[2px_2px_0px_#000] text-black flex items-center justify-center">
               <span class="material-symbols-outlined text-[26px]">verified_user</span>
             </div>
           </div>
         </div>
 
         <!-- Control Toolbar -->
-        <div class="glass-panel rounded-2xl p-4 border border-white/5 mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="bg-[#ebeae5] rounded-2xl p-4 border-2 border-black shadow-[3px_3px_0px_#000] mb-6 flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-mono text-slate-400 uppercase mr-1">FILTER:</span>
-            <button class="order-filter-btn active px-3.5 py-1.5 rounded-lg bg-blue-600 text-white font-mono text-xs font-bold transition-all cursor-pointer" data-filter="ALL">ALL</button>
-            <button class="order-filter-btn px-3.5 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 font-mono text-xs font-semibold transition-all cursor-pointer" data-filter="PENDING">PENDING</button>
-            <button class="order-filter-btn px-3.5 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 font-mono text-xs font-semibold transition-all cursor-pointer" data-filter="APPROVED">APPROVED</button>
-            <button class="order-filter-btn px-3.5 py-1.5 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10 font-mono text-xs font-semibold transition-all cursor-pointer" data-filter="COMPLETED">COMPLETED</button>
+            <span class="text-xs font-mono text-black font-bold uppercase mr-1">FILTER:</span>
+            <button class="order-filter-btn active px-3.5 py-1.5 rounded-lg bg-[#ffb703] text-black font-mono text-xs font-bold border-2 border-black shadow-[2px_2px_0px_#000] transition-all cursor-pointer" data-filter="ALL">ALL</button>
+            <button class="order-filter-btn px-3.5 py-1.5 rounded-lg bg-white text-black hover:bg-[#dadad6] border-2 border-black font-mono text-xs font-bold transition-all cursor-pointer shadow-[2px_2px_0px_#000]" data-filter="PENDING">PENDING</button>
+            <button class="order-filter-btn px-3.5 py-1.5 rounded-lg bg-white text-black hover:bg-[#dadad6] border-2 border-black font-mono text-xs font-bold transition-all cursor-pointer shadow-[2px_2px_0px_#000]" data-filter="APPROVED">APPROVED</button>
+            <button class="order-filter-btn px-3.5 py-1.5 rounded-lg bg-white text-black hover:bg-[#dadad6] border-2 border-black font-mono text-xs font-bold transition-all cursor-pointer shadow-[2px_2px_0px_#000]" data-filter="COMPLETED">COMPLETED</button>
           </div>
 
           <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 text-xs font-mono text-slate-400 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5">
-              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <div class="flex items-center gap-2 text-xs font-mono text-black px-3 py-1.5 rounded-lg bg-white border-2 border-black shadow-[2px_2px_0px_#000] font-bold">
+              <span class="w-2 h-2 rounded-full bg-[#ffb703] animate-ping"></span>
               <span>POLL: 3 DETIK</span>
             </div>
 
-            <button id="btn-refresh-orders" class="h-9 px-3.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1.5 text-xs font-mono text-slate-200 transition-colors cursor-pointer">
+            <button id="btn-refresh-orders" class="h-9 px-4 rounded-xl bg-white hover:bg-[#dadad6] border-2 border-black flex items-center gap-2 text-xs font-mono font-bold text-black transition-colors cursor-pointer shadow-[2px_2px_0px_#000]">
               <span class="material-symbols-outlined text-[16px]">refresh</span>
               <span>REFRESH</span>
             </button>
@@ -380,11 +354,11 @@
         </div>
 
         <!-- Orders Table -->
-        <div class="glass-panel rounded-2xl border border-white/5 overflow-hidden shadow-2xl">
+        <div class="bg-white rounded-2xl border-2 border-black overflow-hidden shadow-[4px_4px_0px_#000]">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-sm">
               <thead>
-                <tr class="bg-white/[0.03] border-b border-white/10 text-xs font-mono text-slate-400 uppercase">
+                <tr class="bg-[#ebeae5] border-b-2 border-black text-xs font-mono text-black uppercase font-bold">
                   <th class="p-4">TRANSACTION ID</th>
                   <th class="p-4">SESSION ID</th>
                   <th class="p-4">FRAME TEMPLATE</th>
@@ -395,9 +369,9 @@
                   <th class="p-4 text-right">AKSI OPERATOR</th>
                 </tr>
               </thead>
-              <tbody id="orders-table-body" class="divide-y divide-white/5 font-mono text-xs text-slate-200">
+              <tbody id="orders-table-body" class="divide-y divide-black/10 font-mono text-xs text-black">
                 <tr>
-                  <td colspan="8" class="p-10 text-center text-slate-400 font-mono">
+                  <td colspan="8" class="p-10 text-center text-gray-500 font-mono">
                     Memindai sesi kiosk yang masuk...
                   </td>
                 </tr>
@@ -413,62 +387,62 @@
           
           <!-- Form Settings (7 cols) -->
           <div class="lg:col-span-7 flex flex-col gap-6">
-            <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-white/5">
-              <div class="flex items-center justify-between pb-5 border-b border-white/10 mb-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border-2 border-black shadow-[4px_4px_0px_#000]">
+              <div class="flex items-center justify-between pb-5 border-b-2 border-black/10 mb-6">
                 <div>
-                  <h2 class="text-xl font-bold text-white">QRIS Gateway & Pengaturan Tarif</h2>
-                  <p class="text-slate-400 text-xs sm:text-sm mt-1">Konfigurasi foto QRIS yang tampil di layar bayar kiosk, nama merchant, dan harga per sesi.</p>
+                  <h2 class="text-xl font-bold font-display text-black">QRIS Gateway & Pengaturan Tarif</h2>
+                  <p class="text-gray-600 text-xs sm:text-sm mt-1">Konfigurasi foto QRIS yang tampil di layar bayar kiosk, nama merchant, dan harga per sesi.</p>
                 </div>
-                <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 text-xs font-mono font-bold border border-blue-500/20">CONFIG</span>
+                <span class="px-2.5 py-1 rounded-md bg-[#ffb703] text-black text-xs font-mono font-bold border-2 border-black shadow-[1px_1px_0px_#000]">CONFIG</span>
               </div>
 
               <form id="qr-settings-form" class="flex flex-col gap-5">
                 
                 <!-- Upload QR File -->
                 <div class="flex flex-col gap-2">
-                  <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex justify-between">
+                  <label class="text-xs font-bold text-black font-mono uppercase tracking-wider flex justify-between">
                     <span>Foto / Gambar QRIS (Upload atau URL)</span>
-                    <span class="text-slate-500 font-normal">PNG / JPG</span>
+                    <span class="text-gray-500 font-normal">PNG / JPG</span>
                   </label>
                   
                   <div class="flex flex-col sm:flex-row gap-3">
                     <input type="file" id="qr-file-input" accept="image/*" class="hidden">
-                    <button type="button" id="btn-trigger-upload-qr" class="h-12 px-5 rounded-xl bg-white/5 hover:bg-white/10 border border-dashed border-white/20 hover:border-white/40 text-xs font-bold flex items-center justify-center gap-2 text-white transition-all cursor-pointer">
-                      <span class="material-symbols-outlined text-[20px] text-blue-400">upload_file</span>
+                    <button type="button" id="btn-trigger-upload-qr" class="h-12 px-5 rounded-xl bg-[#ebeae5] hover:bg-[#dadad6] border-2 border-dashed border-black text-xs font-mono font-bold flex items-center justify-center gap-2 text-black transition-all cursor-pointer shadow-[2px_2px_0px_#000]">
+                      <span class="material-symbols-outlined text-[20px] text-black">upload_file</span>
                       <span>UPLOAD FOTO QRIS</span>
                     </button>
-                    <button type="button" id="btn-reset-qr" class="h-12 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 transition-colors cursor-pointer">
+                    <button type="button" id="btn-reset-qr" class="h-12 px-4 rounded-xl bg-white hover:bg-[#ebeae5] border-2 border-black text-xs font-mono font-bold text-black transition-colors cursor-pointer shadow-[2px_2px_0px_#000]">
                       RESET DEFAULT SVG
                     </button>
                   </div>
-                  <input type="text" id="qr-image-url-input" placeholder="Atau tempel link URL foto QRIS (https://...)" class="w-full h-11 px-4 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-slate-200 focus:border-blue-500 focus:outline-none transition-colors">
+                  <input type="text" id="qr-image-url-input" placeholder="Atau tempel link URL foto QRIS (https://...)" class="w-full h-11 px-4 rounded-xl bg-[#faf9f5] border-2 border-black text-xs font-mono text-black focus:bg-white focus:outline-none transition-colors">
                 </div>
 
                 <!-- Merchant Name -->
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">Nama Bisnis / Merchant</label>
-                  <input type="text" id="merchant-name-input" value="KREASI THERMAL PHOTOBOOTH" class="w-full h-11 px-4 rounded-xl bg-black/40 border border-white/10 text-sm font-semibold text-white focus:border-blue-500 focus:outline-none transition-colors">
+                  <label class="text-xs font-bold text-black font-mono uppercase tracking-wider">Nama Bisnis / Merchant</label>
+                  <input type="text" id="merchant-name-input" value="KREASI THERMAL PHOTOBOOTH" class="w-full h-11 px-4 rounded-xl bg-[#faf9f5] border-2 border-black text-sm font-semibold text-black focus:bg-white focus:outline-none transition-colors">
                 </div>
 
                 <!-- NMID -->
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">National Merchant ID (NMID)</label>
-                  <input type="text" id="merchant-nmid-input" value="ID102049281729" class="w-full h-11 px-4 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-slate-200 focus:border-blue-500 focus:outline-none transition-colors">
+                  <label class="text-xs font-bold text-black font-mono uppercase tracking-wider">National Merchant ID (NMID)</label>
+                  <input type="text" id="merchant-nmid-input" value="ID102049281729" class="w-full h-11 px-4 rounded-xl bg-[#faf9f5] border-2 border-black text-xs font-mono text-black focus:bg-white focus:outline-none transition-colors">
                 </div>
 
                 <!-- Price & Mode -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">Tarif Default (Rupiah)</label>
+                    <label class="text-xs font-bold text-black font-mono uppercase tracking-wider">Tarif Default (Rupiah)</label>
                     <div class="relative flex items-center">
-                      <span class="absolute left-4 text-xs font-mono font-bold text-slate-400">Rp</span>
-                      <input type="number" id="default-price-input" value="35000" step="1000" class="w-full h-11 pl-11 pr-4 rounded-xl bg-black/40 border border-white/10 text-sm font-mono font-bold text-white focus:border-blue-500 focus:outline-none transition-colors">
+                      <span class="absolute left-4 text-xs font-mono font-bold text-gray-500">Rp</span>
+                      <input type="number" id="default-price-input" value="35000" step="1000" class="w-full h-11 pl-11 pr-4 rounded-xl bg-[#faf9f5] border-2 border-black text-sm font-mono font-bold text-black focus:bg-white focus:outline-none transition-colors">
                     </div>
                   </div>
 
                   <div class="flex flex-col gap-1.5">
-                    <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">Mode Persetujuan</label>
-                    <select id="payment-mode-select" class="w-full h-11 px-3 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-slate-200 focus:border-blue-500 focus:outline-none transition-colors">
+                    <label class="text-xs font-bold text-black font-mono uppercase tracking-wider">Mode Persetujuan</label>
+                    <select id="payment-mode-select" class="w-full h-11 px-3 rounded-xl bg-[#faf9f5] border-2 border-black text-xs font-mono font-bold text-black focus:bg-white focus:outline-none transition-colors">
                       <option value="manual_acc">MANUAL OPERATOR ACC (Rekomendasi)</option>
                       <option value="auto_instant">INSTANT AUTO-APPROVE (Mode Demo)</option>
                     </select>
@@ -476,8 +450,8 @@
                 </div>
 
                 <!-- Save Button -->
-                <div class="pt-4 border-t border-white/10 flex justify-end">
-                  <button type="submit" class="h-12 px-7 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-[0_0_20px_rgba(59,130,246,0.35)] text-sm font-bold text-white flex items-center gap-2 transition-all cursor-pointer">
+                <div class="pt-4 border-t-2 border-black/10 flex justify-end">
+                  <button type="submit" class="h-12 px-7 rounded-xl bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black text-black font-mono font-black shadow-[3px_3px_0px_#000] text-xs flex items-center gap-2 transition-all cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
                     <span class="material-symbols-outlined text-[18px]">save</span>
                     <span>SIMPAN PENGATURAN QR & TARIF</span>
                   </button>
@@ -488,29 +462,29 @@
 
           <!-- Live Visual Preview (5 cols) -->
           <div class="lg:col-span-5 flex flex-col gap-4">
-            <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-white/5">
-              <span class="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-4 text-center">
+            <div class="bg-[#ebeae5] rounded-2xl p-6 sm:p-8 border-2 border-black shadow-[4px_4px_0px_#000]">
+              <span class="text-xs font-mono text-black font-bold uppercase tracking-wider block mb-4 text-center">
                 [ PREVIEW TAMPILAN KIOSK ]
               </span>
 
-              <div class="rounded-2xl bg-[#090e1a] border border-white/10 p-6 flex flex-col items-center text-center shadow-xl">
-                <span class="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono text-xs font-bold uppercase mb-3">
+              <div class="rounded-2xl bg-white border-2 border-black p-6 flex flex-col items-center text-center shadow-[3px_3px_0px_#000]">
+                <span class="px-3 py-1 rounded-full bg-[#ffb703] border-2 border-black text-black font-mono text-xs font-bold uppercase mb-3 shadow-[1px_1px_0px_#000]">
                   QRIS INSTANT PAYMENT
                 </span>
                 
-                <h3 id="preview-merchant-name" class="text-lg font-bold text-white uppercase">
+                <h3 id="preview-merchant-name" class="text-lg font-bold font-display text-black uppercase">
                   KREASI THERMAL PHOTOBOOTH
                 </h3>
                 
-                <span id="preview-tariff" class="text-3xl font-extrabold text-emerald-400 my-2 font-mono">
+                <span id="preview-tariff" class="text-3xl font-extrabold text-[#059669] my-2 font-mono">
                   Rp 35.000
                 </span>
 
                 <!-- QR Box Preview with Laser Beam -->
-                <div class="relative my-4 p-4 rounded-xl bg-white flex items-center justify-center w-52 h-52 shadow-[0_0_30px_rgba(255,255,255,0.08)]">
+                <div class="relative my-4 p-4 rounded-xl bg-white border-2 border-black flex items-center justify-center w-52 h-52 shadow-[3px_3px_0px_#000]">
                   <span class="dark-laser-beam"></span>
                   <div id="preview-qr-box" class="w-full h-full flex items-center justify-center">
-                    <svg class="w-full h-full text-slate-900" fill="currentColor" viewBox="0 0 100 100">
+                    <svg class="w-full h-full text-black" fill="currentColor" viewBox="0 0 100 100">
                       <rect height="28" width="28" x="5" y="5"></rect>
                       <rect fill="#ffffff" height="20" width="20" x="9" y="9"></rect>
                       <rect height="12" width="12" x="13" y="13"></rect>
@@ -522,17 +496,17 @@
                       <rect height="12" width="12" x="13" y="75"></rect>
                       <rect height="8" width="8" x="37" y="37"></rect>
                       <rect height="8" width="8" x="57" y="37"></rect>
-                      <rect height="12" width="12" x="45" y="45" fill="#0284c7"></rect>
+                      <rect height="12" width="12" x="45" y="45" fill="#ffb703"></rect>
                       <rect height="8" width="8" x="69" y="61"></rect>
                       <rect height="8" width="8" x="77" y="81"></rect>
                     </svg>
                   </div>
                 </div>
 
-                <span id="preview-nmid" class="text-xs font-mono text-slate-400 font-semibold">
+                <span id="preview-nmid" class="text-xs font-mono text-gray-700 font-bold">
                   NMID: ID102049281729
                 </span>
-                <span class="text-[11px] text-slate-500 mt-2">
+                <span class="text-[11px] text-gray-500 font-mono mt-2">
                   Bisa di-scan lewat BCA, Mandiri, GoPay, OVO, ShopeePay, DANA
                 </span>
               </div>
@@ -543,13 +517,13 @@
 
       <!-- Module 3 Content: Frame Management -->
       <section id="tab-frames" class="admin-tab-content hidden">
-        <div class="glass-panel rounded-2xl p-6 border border-white/5 mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="bg-[#ebeae5] rounded-2xl p-6 border-2 border-black shadow-[4px_4px_0px_#000] mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold text-white">Geometri Frame & Template Struk</h2>
-            <p class="text-slate-400 text-xs sm:text-sm mt-1">Kelola template frame foto, jumlah pose jepretan, aspect ratio, dan harga spesifik frame.</p>
+            <h2 class="text-xl font-bold font-display text-black">Geometri Frame & Template Struk</h2>
+            <p class="text-gray-600 text-xs sm:text-sm mt-1">Kelola template frame foto, jumlah pose jepretan, aspect ratio, dan harga spesifik frame.</p>
           </div>
 
-          <button id="btn-open-create-frame" class="h-11 px-5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-[0_0_20px_rgba(168,85,247,0.35)] text-xs font-bold text-white flex items-center gap-2 transition-all cursor-pointer">
+          <button id="btn-open-create-frame" class="h-11 px-5 rounded-xl bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black shadow-[3px_3px_0px_#000] text-xs font-mono font-black text-black flex items-center gap-2 transition-all cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
             <span class="material-symbols-outlined text-[18px]">add_box</span>
             <span>TAMBAH FRAME BARU</span>
           </button>
@@ -560,30 +534,30 @@
         </div>
 
         <!-- Frame Create/Edit Modal -->
-        <div id="frame-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-          <div class="glass-panel rounded-2xl max-w-xl w-full p-6 sm:p-8 border border-white/10 relative shadow-2xl">
-            <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-              <h3 id="frame-modal-title" class="text-lg font-bold text-white">TAMBAH FRAME BARU</h3>
-              <button id="btn-close-frame-modal" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer">✕</button>
+        <div id="frame-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+          <div class="bg-[#faf9f5] rounded-2xl max-w-xl w-full p-6 sm:p-8 border-2 border-black relative shadow-[8px_8px_0px_#000]">
+            <div class="flex items-center justify-between pb-4 border-b-2 border-black mb-5">
+              <h3 id="frame-modal-title" class="text-lg font-bold font-display text-black">TAMBAH FRAME BARU</h3>
+              <button id="btn-close-frame-modal" class="w-8 h-8 rounded-lg bg-white hover:bg-gray-100 border-2 border-black flex items-center justify-center text-black font-bold transition-colors cursor-pointer">✕</button>
             </div>
 
             <form id="frame-form" class="flex flex-col gap-4 text-xs font-mono">
               <input type="hidden" id="modal-frame-id">
               
               <div class="flex flex-col gap-1.5">
-                <label class="text-slate-300 font-bold uppercase">Nama Frame</label>
-                <input type="text" id="modal-frame-name" placeholder="misal: CLASSIC 3-CUT STRIP" required class="h-10 px-3.5 rounded-lg bg-black/40 border border-white/10 text-white focus:border-blue-500 focus:outline-none">
+                <label class="text-black font-bold uppercase">Nama Frame</label>
+                <input type="text" id="modal-frame-name" placeholder="misal: CLASSIC 3-CUT STRIP" required class="h-10 px-3.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703]">
               </div>
 
               <div class="flex flex-col gap-1.5">
-                <label class="text-slate-300 font-bold uppercase">Deskripsi / Subtitle</label>
-                <input type="text" id="modal-frame-desc" placeholder="misal: 3 pose square vertical strip..." class="h-10 px-3.5 rounded-lg bg-black/40 border border-white/10 text-white focus:border-blue-500 focus:outline-none">
+                <label class="text-black font-bold uppercase">Deskripsi / Subtitle</label>
+                <input type="text" id="modal-frame-desc" placeholder="misal: 3 pose square vertical strip..." class="h-10 px-3.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703]">
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-slate-300 font-bold uppercase">Jumlah Pose (Snaps)</label>
-                  <select id="modal-frame-poses" class="h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-white font-bold focus:border-blue-500 focus:outline-none">
+                  <label class="text-black font-bold uppercase">Jumlah Pose (Snaps)</label>
+                  <select id="modal-frame-poses" class="h-10 px-3 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none">
                     <option value="1">1 POSE (Single)</option>
                     <option value="2">2 POSES (Duo)</option>
                     <option value="3" selected>3 POSES (Standard Strip)</option>
@@ -593,15 +567,15 @@
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-slate-300 font-bold uppercase">Tarif (IDR)</label>
-                  <input type="number" id="modal-frame-price" value="35000" step="1000" class="h-10 px-3.5 rounded-lg bg-black/40 border border-white/10 text-white font-bold focus:border-blue-500 focus:outline-none">
+                  <label class="text-black font-bold uppercase">Tarif (IDR)</label>
+                  <input type="number" id="modal-frame-price" value="35000" step="1000" class="h-10 px-3.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none">
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-slate-300 font-bold uppercase">Aspect Ratio</label>
-                  <select id="modal-frame-aspect" class="h-10 px-3 rounded-lg bg-black/40 border border-white/10 text-white font-bold focus:border-blue-500 focus:outline-none">
+                  <label class="text-black font-bold uppercase">Aspect Ratio</label>
+                  <select id="modal-frame-aspect" class="h-10 px-3 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none">
                     <option value="1:1" selected>1:1 SQUARE</option>
                     <option value="4:5">4:5 PORTRAIT</option>
                     <option value="4:3">4:3 CLASSIC</option>
@@ -610,19 +584,19 @@
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-slate-300 font-bold uppercase">Badge Promosi</label>
-                  <input type="text" id="modal-frame-badge" placeholder="POPULAR / NEW" class="h-10 px-3.5 rounded-lg bg-black/40 border border-white/10 text-white focus:border-blue-500 focus:outline-none">
+                  <label class="text-black font-bold uppercase">Badge Promosi</label>
+                  <input type="text" id="modal-frame-badge" placeholder="POPULAR / NEW" class="h-10 px-3.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none">
                 </div>
               </div>
 
               <div class="flex items-center gap-2 pt-2">
-                <input type="checkbox" id="modal-frame-active" checked class="w-4 h-4 rounded accent-blue-500 cursor-pointer">
-                <label for="modal-frame-active" class="text-slate-300 font-bold uppercase cursor-pointer">TAMPIL DI LAYAR KIOSK CUSTOMER</label>
+                <input type="checkbox" id="modal-frame-active" checked class="w-4 h-4 rounded accent-[#ffb703] cursor-pointer">
+                <label for="modal-frame-active" class="text-black font-bold uppercase cursor-pointer">TAMPIL DI LAYAR KIOSK CUSTOMER</label>
               </div>
 
-              <div class="pt-4 border-t border-white/10 flex justify-end gap-3">
-                <button type="button" id="btn-cancel-frame" class="h-10 px-4 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 font-bold uppercase cursor-pointer">Batal</button>
-                <button type="submit" class="h-10 px-5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase cursor-pointer">Simpan Frame</button>
+              <div class="pt-4 border-t-2 border-black flex justify-end gap-3">
+                <button type="button" id="btn-cancel-frame" class="h-10 px-4 rounded-lg bg-white hover:bg-gray-100 border-2 border-black text-black font-bold uppercase cursor-pointer shadow-[2px_2px_0px_#000]">Batal</button>
+                <button type="submit" class="h-10 px-5 rounded-lg bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black text-black font-bold uppercase cursor-pointer shadow-[2px_2px_0px_#000]">Simpan Frame</button>
               </div>
             </form>
           </div>
@@ -631,13 +605,13 @@
 
       <!-- Module 4 Content: Photo Styles & Dither -->
       <section id="tab-styles" class="admin-tab-content hidden">
-        <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-white/5 mb-6">
-          <div class="flex items-center justify-between pb-5 border-b border-white/10 mb-6">
+        <div class="bg-[#ebeae5] rounded-2xl p-6 sm:p-8 border-2 border-black shadow-[4px_4px_0px_#000] mb-6">
+          <div class="flex items-center justify-between pb-5 border-b-2 border-black/10 mb-6">
             <div>
-              <h2 class="text-xl font-bold text-white">Photo Styles & Algoritma Dithering Thermal</h2>
-              <p class="text-slate-400 text-xs sm:text-sm mt-1">Aktifkan efek dithering 1-bit, tentukan filter default, dan kalibrasi kurva kontras printer.</p>
+              <h2 class="text-xl font-bold font-display text-black">Photo Styles & Algoritma Dithering Thermal</h2>
+              <p class="text-gray-600 text-xs sm:text-sm mt-1">Aktifkan efek dithering 1-bit, tentukan filter default, dan kalibrasi kurva kontras printer.</p>
             </div>
-            <button id="btn-save-styles" class="h-11 px-5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-[0_0_20px_rgba(16,185,129,0.35)] text-xs font-bold text-white flex items-center gap-2 transition-all cursor-pointer">
+            <button id="btn-save-styles" class="h-11 px-5 rounded-xl bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black shadow-[3px_3px_0px_#000] text-xs font-mono font-black text-black flex items-center gap-2 transition-all cursor-pointer active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
               <span class="material-symbols-outlined text-[18px]">save</span>
               <span>SIMPAN PRESET STYLES</span>
             </button>
@@ -651,18 +625,18 @@
 
       <!-- Module 5 Content: Data Foto & Arsip -->
       <section id="tab-photos" class="admin-tab-content hidden">
-        <div class="glass-panel rounded-2xl p-4 border border-white/5 mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="bg-[#ebeae5] rounded-2xl p-4 border-2 border-black shadow-[4px_4px_0px_#000] mb-6 flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-3">
             <div class="relative">
-              <span class="material-symbols-outlined absolute left-3.5 top-2.5 text-slate-400 text-[18px]">search</span>
-              <input type="text" id="photo-search-input" placeholder="Cari Session ID atau Tanggal..." class="h-10 pl-10 pr-4 w-64 sm:w-80 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-white focus:border-blue-500 focus:outline-none">
+              <span class="material-symbols-outlined absolute left-3.5 top-2.5 text-gray-500 text-[18px]">search</span>
+              <input type="text" id="photo-search-input" placeholder="Cari Session ID atau Tanggal..." class="h-10 pl-10 pr-4 w-64 sm:w-80 rounded-xl bg-white border-2 border-black text-xs font-mono text-black focus:outline-none">
             </div>
-            <span id="photo-count-indicator" class="font-mono text-xs px-3.5 py-2 rounded-lg bg-white/5 border border-white/5 text-slate-300 font-bold">
+            <span id="photo-count-indicator" class="font-mono text-xs px-3.5 py-2 rounded-lg bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0px_#000]">
               ARSIP: 0 STRUK
             </span>
           </div>
 
-          <button id="btn-refresh-photos" class="h-10 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 font-mono text-xs text-slate-200 transition-colors cursor-pointer">
+          <button id="btn-refresh-photos" class="h-10 px-4 rounded-xl bg-white hover:bg-gray-100 border-2 border-black flex items-center gap-2 font-mono text-xs text-black font-bold transition-colors cursor-pointer shadow-[2px_2px_0px_#000]">
             <span class="material-symbols-outlined text-[16px]">refresh</span>
             <span>REFRESH ARSIP</span>
           </button>
@@ -674,27 +648,27 @@
         </div>
 
         <!-- Lightbox Modal -->
-        <div id="photo-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
-          <div class="glass-panel rounded-2xl max-w-xl w-full p-6 border border-white/10 relative max-h-[90vh] flex flex-col shadow-2xl">
-            <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4 font-mono">
+        <div id="photo-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+          <div class="bg-[#faf9f5] rounded-2xl max-w-xl w-full p-6 border-2 border-black relative max-h-[90vh] flex flex-col shadow-[8px_8px_0px_#000]">
+            <div class="flex items-center justify-between pb-3 border-b-2 border-black mb-4 font-mono">
               <div class="flex items-center gap-2">
-                <span id="modal-photo-session" class="text-sm font-bold bg-blue-600 text-white px-2.5 py-0.5 rounded-md">SESS-0000</span>
-                <span id="modal-photo-date" class="text-xs text-slate-400">2026-10-22</span>
+                <span id="modal-photo-session" class="text-sm font-bold bg-[#ffb703] border-2 border-black text-black px-2.5 py-0.5 rounded-md shadow-[1px_1px_0px_#000]">SESS-0000</span>
+                <span id="modal-photo-date" class="text-xs text-gray-700 font-bold">2026-10-22</span>
               </div>
-              <button id="btn-close-photo-modal" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer">✕</button>
+              <button id="btn-close-photo-modal" class="w-8 h-8 rounded-lg bg-white hover:bg-gray-100 border-2 border-black flex items-center justify-center text-black font-bold transition-colors cursor-pointer">✕</button>
             </div>
 
-            <div class="overflow-y-auto flex-1 flex justify-center bg-black/50 p-4 rounded-xl border border-white/5 mb-4">
-              <img id="modal-photo-img" src="" alt="Thermal Strip" class="max-h-[60vh] object-contain rounded-md shadow-2xl">
+            <div class="overflow-y-auto flex-1 flex justify-center bg-[#ebeae5] p-4 rounded-xl border-2 border-black mb-4">
+              <img id="modal-photo-img" src="" alt="Thermal Strip" class="max-h-[60vh] object-contain rounded-md shadow-lg border border-black">
             </div>
 
             <div class="flex items-center justify-between font-mono text-xs">
-              <button id="modal-photo-reprint" class="h-10 px-4 rounded-lg bg-white/10 hover:bg-white/15 border border-white/10 text-white font-bold flex items-center gap-1.5 cursor-pointer">
+              <button id="modal-photo-reprint" class="h-10 px-4 rounded-lg bg-white hover:bg-gray-100 border-2 border-black text-black font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#000]">
                 <span class="material-symbols-outlined text-[16px]">print</span>
                 <span>REPRINT STRUK</span>
               </button>
 
-              <a id="modal-photo-download" href="#" download class="h-10 px-5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center gap-1.5 cursor-pointer">
+              <a id="modal-photo-download" href="#" download class="h-10 px-5 rounded-lg bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black text-black font-bold flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_#000]">
                 <span class="material-symbols-outlined text-[16px]">download</span>
                 <span>DOWNLOAD PNG</span>
               </a>
@@ -708,126 +682,126 @@
   </main>
 
   <!-- =========================================================================
-       SYSTEM & ENVIRONMENT (.ENV) CONFIGURATION MODAL
+       SYSTEM & ENVIRONMENT (.ENV) CONFIGURATION MODAL (THERMAL BRUTALISM)
        ========================================================================= -->
-  <div id="modal-config" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-6 transition-all duration-300">
-    <div class="glass-panel rounded-2xl max-w-4xl w-full border border-white/15 relative max-h-[92vh] flex flex-col shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden">
+  <div id="modal-config" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-6 transition-all duration-300">
+    <div class="bg-[#faf9f5] rounded-2xl max-w-4xl w-full border-2 border-black relative max-h-[92vh] flex flex-col shadow-[8px_8px_0px_#000] overflow-hidden">
       
       <!-- Modal Header -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
+      <div class="flex items-center justify-between px-6 py-4 border-b-2 border-black bg-[#ebeae5]">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl glow-cyan flex items-center justify-center text-white">
+          <div class="w-10 h-10 rounded-xl bg-[#ffb703] border-2 border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-black">
             <span class="material-symbols-outlined text-[22px]">tune</span>
           </div>
           <div>
-            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <h2 class="text-base sm:text-lg font-bold font-display text-black flex items-center gap-2">
               <span>Konfigurasi Sistem & Environment</span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">.ENV</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-black text-[#ffb703] border border-black font-bold">.ENV</span>
             </h2>
-            <p class="text-xs text-slate-400 font-sans">
+            <p class="text-xs text-gray-700 font-mono">
               Kelola Cloudflare R2 storage, identitas kiosk booth, printer thermal 80mm, dan variabel .env
             </p>
           </div>
         </div>
-        <button id="btn-close-config" type="button" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer" title="Tutup Modal">
+        <button id="btn-close-config" type="button" class="w-8 h-8 rounded-lg bg-white hover:bg-gray-100 border-2 border-black flex items-center justify-center text-black font-bold transition-colors cursor-pointer" title="Tutup Modal">
           ✕
         </button>
       </div>
 
       <!-- Modal Tabs Navigation -->
-      <div class="flex items-center gap-2 px-6 pt-3 border-b border-white/10 bg-black/20 overflow-x-auto text-xs font-mono">
-        <button type="button" class="cfg-subtab active px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-r2">
+      <div class="flex items-center gap-2 px-6 pt-3 border-b-2 border-black bg-[#dadad6] overflow-x-auto text-xs font-mono">
+        <button type="button" class="cfg-subtab active px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-2 border-black border-b-0 bg-[#faf9f5] text-black cursor-pointer -mb-[2px]" data-cfg-tab="cfg-tab-r2">
           <span class="material-symbols-outlined text-[16px]">cloud_upload</span>
           <span>CLOUDFLARE R2</span>
         </button>
-        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-kiosk">
+        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-2 border-transparent text-gray-700 hover:text-black cursor-pointer transition-colors" data-cfg-tab="cfg-tab-kiosk">
           <span class="material-symbols-outlined text-[16px]">terminal</span>
           <span>KIOSK & SERVER</span>
         </button>
-        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-printer">
+        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-2 border-transparent text-gray-700 hover:text-black cursor-pointer transition-colors" data-cfg-tab="cfg-tab-printer">
           <span class="material-symbols-outlined text-[16px]">print</span>
           <span>PRINTER THERMAL</span>
         </button>
-        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-raw">
+        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-2 border-transparent text-gray-700 hover:text-black cursor-pointer transition-colors" data-cfg-tab="cfg-tab-raw">
           <span class="material-symbols-outlined text-[16px]">code</span>
           <span>RAW .ENV EDITOR</span>
         </button>
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm">
+      <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm bg-[#faf9f5]">
         
         <!-- ================= TAB 1: CLOUDFLARE R2 ================= -->
         <div id="cfg-tab-r2" class="cfg-tab-content space-y-5">
-          <div class="p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/20 flex items-start gap-3">
-            <span class="material-symbols-outlined text-cyan-400 text-[24px] mt-0.5">info</span>
-            <div class="text-xs text-slate-300 leading-relaxed font-sans">
-              <strong class="text-white font-semibold">Cloudflare R2 Object Storage (S3-Compatible):</strong>
+          <div class="p-4 rounded-xl bg-[#ebeae5] border-2 border-black shadow-[2px_2px_0px_#000] flex items-start gap-3">
+            <span class="material-symbols-outlined text-[#ffb703] text-[24px] mt-0.5">info</span>
+            <div class="text-xs text-black leading-relaxed font-sans">
+              <strong class="text-black font-bold">Cloudflare R2 Object Storage (S3-Compatible):</strong>
               Foto strip 80mm yang diambil dari kiosk otomatis diunggah ke Cloudflare R2 bucket. R2 gratis transfer keluar (Zero Egress Fees) & menyediakan URL download instan via barcode QR di struk.
             </div>
           </div>
 
           <!-- R2 Enabled Switch -->
-          <div class="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+          <div class="flex items-center justify-between p-4 rounded-xl bg-white border-2 border-black shadow-[2px_2px_0px_#000]">
             <div>
-              <h4 class="text-sm font-bold text-white">Sinkronisasi Cloudflare R2</h4>
-              <p class="text-xs text-slate-400">Aktifkan pengunggahan otomatis master photo strip ke bucket R2</p>
+              <h4 class="text-sm font-bold text-black font-display">Sinkronisasi Cloudflare R2</h4>
+              <p class="text-xs text-gray-600 font-mono">Aktifkan pengunggahan otomatis master photo strip ke bucket R2</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" id="cfg-r2-enabled" class="sr-only peer">
-              <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+              <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-black after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#ffb703] border-2 border-black"></div>
             </label>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">R2_ACCOUNT_ID</label>
-              <input type="text" id="cfg-r2-account-id" placeholder="e.g. 7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
-              <span class="text-[10px] text-slate-500">Ditemukan di dashboard Cloudflare > R2 Overview (sebelah kanan)</span>
+              <label class="block text-black mb-1.5 font-bold">R2_ACCOUNT_ID</label>
+              <input type="text" id="cfg-r2-account-id" placeholder="e.g. 7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
+              <span class="text-[10px] text-gray-600">Ditemukan di dashboard Cloudflare > R2 Overview (sebelah kanan)</span>
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">R2_BUCKET_NAME</label>
-              <input type="text" id="cfg-r2-bucket-name" placeholder="photobooth-prints" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
-              <span class="text-[10px] text-slate-500">Nama bucket R2 yang sudah dibuat di Cloudflare</span>
+              <label class="block text-black mb-1.5 font-bold">R2_BUCKET_NAME</label>
+              <input type="text" id="cfg-r2-bucket-name" placeholder="photobooth-prints" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
+              <span class="text-[10px] text-gray-600">Nama bucket R2 yang sudah dibuat di Cloudflare</span>
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">R2_ACCESS_KEY_ID</label>
-              <input type="text" id="cfg-r2-access-key" placeholder="e.g. 4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
-              <span class="text-[10px] text-slate-500">Dibuat dari menu 'Manage R2 API Tokens' (Permission: Object Read & Write)</span>
+              <label class="block text-black mb-1.5 font-bold">R2_ACCESS_KEY_ID</label>
+              <input type="text" id="cfg-r2-access-key" placeholder="e.g. 4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
+              <span class="text-[10px] text-gray-600">Dibuat dari menu 'Manage R2 API Tokens' (Permission: Object Read & Write)</span>
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">R2_SECRET_ACCESS_KEY</label>
+              <label class="block text-black mb-1.5 font-bold">R2_SECRET_ACCESS_KEY</label>
               <div class="relative">
-                <input type="password" id="cfg-r2-secret-key" placeholder="••••••••••••••••••••••••" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors pr-10">
-                <button type="button" id="btn-toggle-secret-key" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-white" title="Lihat/Sembunyikan">
+                <input type="password" id="cfg-r2-secret-key" placeholder="••••••••••••••••••••••••" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors pr-10">
+                <button type="button" id="btn-toggle-secret-key" class="absolute right-2.5 top-2.5 text-gray-600 hover:text-black" title="Lihat/Sembunyikan">
                   <span class="material-symbols-outlined text-[18px]">visibility</span>
                 </button>
               </div>
-              <span class="text-[10px] text-slate-500">Secret key dari token API Cloudflare R2</span>
+              <span class="text-[10px] text-gray-600">Secret key dari token API Cloudflare R2</span>
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-slate-300 mb-1.5 font-bold">R2_WORKER_URL (CLOUDFLARE WORKER GATEWAY)</label>
-              <input type="text" id="cfg-r2-worker-url" placeholder="https://project-pb.denispratama2008.workers.dev" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
-              <span class="text-[10px] text-slate-500">URL Cloudflare Worker project-pb hasil deploy dari dashboard Cloudflare</span>
+              <label class="block text-black mb-1.5 font-bold">R2_WORKER_URL (CLOUDFLARE WORKER GATEWAY)</label>
+              <input type="text" id="cfg-r2-worker-url" placeholder="https://project-pb.denispratama2008.workers.dev" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
+              <span class="text-[10px] text-gray-600">URL Cloudflare Worker project-pb hasil deploy dari dashboard Cloudflare</span>
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-slate-300 mb-1.5 font-bold">R2_PUBLIC_DOMAIN / CUSTOM DOMAIN (URL PUBLIK STRUK)</label>
-              <input type="text" id="cfg-r2-public-domain" placeholder="https://pub-xxxxxx.r2.dev atau https://project-pb.denispratama2008.workers.dev" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
-              <span class="text-[10px] text-slate-500">Domain publik R2 atau URL worker yang dicetak di QR struk untuk download pengunjung</span>
+              <label class="block text-black mb-1.5 font-bold">R2_PUBLIC_DOMAIN / CUSTOM DOMAIN (URL PUBLIK STRUK)</label>
+              <input type="text" id="cfg-r2-public-domain" placeholder="https://pub-xxxxxx.r2.dev atau https://project-pb.denispratama2008.workers.dev" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
+              <span class="text-[10px] text-gray-600">Domain publik R2 atau URL worker yang dicetak di QR struk untuk download pengunjung</span>
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-2">
-            <button type="button" id="btn-test-r2" class="px-4 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer">
-              <span class="material-symbols-outlined text-[16px]">network_check</span>
+            <button type="button" id="btn-test-r2" class="px-4 py-2 rounded-lg bg-white hover:bg-gray-100 border-2 border-black text-black text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer shadow-[2px_2px_0px_#000]">
+              <span class="material-symbols-outlined text-[16px] text-[#ffb703]">network_check</span>
               <span>TEST KONEKSI R2</span>
             </button>
-            <span id="test-r2-status" class="text-xs font-mono text-slate-400"></span>
+            <span id="test-r2-status" class="text-xs font-mono text-gray-700 font-bold"></span>
           </div>
         </div>
 
@@ -835,36 +809,36 @@
         <div id="cfg-tab-kiosk" class="cfg-tab-content space-y-4 hidden">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">PORT SERVER BACKEND</label>
-              <input type="number" id="cfg-server-port" placeholder="5000" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">PORT SERVER BACKEND</label>
+              <input type="number" id="cfg-server-port" placeholder="5000" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">API_BASE_URL (FRONTEND KE BACKEND)</label>
-              <input type="text" id="cfg-api-base-url" placeholder="http://localhost:5000" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">API_BASE_URL (FRONTEND KE BACKEND)</label>
+              <input type="text" id="cfg-api-base-url" placeholder="http://localhost:5000" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">KIOSK_NAME (NAMA BOOTH)</label>
-              <input type="text" id="cfg-kiosk-name" placeholder="KIOSK #04" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">KIOSK_NAME (NAMA BOOTH)</label>
+              <input type="text" id="cfg-kiosk-name" placeholder="KIOSK #04" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">HARDWARE_ID (ID MESIN)</label>
-              <input type="text" id="cfg-hardware-id" placeholder="TB-80MM-STATION-A9" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">HARDWARE_ID (ID MESIN)</label>
+              <input type="text" id="cfg-hardware-id" placeholder="TB-80MM-STATION-A9" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">MODE ACC PEMBAYARAN KIOSK</label>
-              <select id="cfg-payment-mode" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">MODE ACC PEMBAYARAN KIOSK</label>
+              <select id="cfg-payment-mode" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
                 <option value="manual_acc">MANUAL ACC OPERATOR (Admin klik tombol ACC)</option>
                 <option value="auto_instant">AUTO INSTANT ACC (Langsung buka kamera)</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">AUTO_ACC_TIMEOUT (DETIK)</label>
-              <input type="number" id="cfg-auto-acc-timeout" placeholder="30" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">AUTO_ACC_TIMEOUT (DETIK)</label>
+              <input type="number" id="cfg-auto-acc-timeout" placeholder="30" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
             </div>
           </div>
         </div>
@@ -873,8 +847,8 @@
         <div id="cfg-tab-printer" class="cfg-tab-content space-y-4 hidden">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">INTERFACE PRINTER</label>
-              <select id="cfg-printer-interface" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">INTERFACE PRINTER</label>
+              <select id="cfg-printer-interface" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
                 <option value="direct_usb">DIRECT USB (Direct ESC/POS Raw)</option>
                 <option value="network_tcp">NETWORK LAN / TCP (IP Socket Port 9100)</option>
                 <option value="system_spooler">WINDOWS DRIVER SPOOLER (System Print)</option>
@@ -882,68 +856,68 @@
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">PRINTER IP / PORT ADDRESS</label>
-              <input type="text" id="cfg-printer-ip" placeholder="192.168.1.200:9100 atau COM3" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">PRINTER IP / PORT ADDRESS</label>
+              <input type="text" id="cfg-printer-ip" placeholder="192.168.1.200:9100 atau COM3" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">LEBAR KERTAS (PAPER WIDTH)</label>
-              <select id="cfg-paper-width" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <label class="block text-black mb-1.5 font-bold">LEBAR KERTAS (PAPER WIDTH)</label>
+              <select id="cfg-paper-width" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
                 <option value="80mm">80MM (576 Dots - Standar Photobooth Strip)</option>
                 <option value="58mm">58MM (384 Dots - Mini Pocket Struk)</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-slate-300 mb-1.5 font-bold">KERAPATAN HEAD THERMAL (DENSITY 1-15)</label>
+              <label class="block text-black mb-1.5 font-bold">KERAPATAN HEAD THERMAL (DENSITY 1-15)</label>
               <div class="flex items-center gap-3">
-                <input type="range" id="cfg-printer-density" min="1" max="15" value="8" class="flex-1 accent-cyan-400 cursor-pointer">
-                <span id="cfg-density-val" class="text-white font-bold w-16 text-center bg-white/5 py-1 rounded">LEVEL 8</span>
+                <input type="range" id="cfg-printer-density" min="1" max="15" value="8" class="flex-1 accent-[#ffb703] cursor-pointer">
+                <span id="cfg-density-val" class="text-black font-bold w-16 text-center bg-white border-2 border-black py-1 rounded shadow-[1px_1px_0px_#000]">LEVEL 8</span>
               </div>
             </div>
 
-            <div class="md:col-span-2 flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div class="md:col-span-2 flex items-center justify-between p-4 rounded-xl bg-white border-2 border-black shadow-[2px_2px_0px_#000]">
               <div>
-                <h4 class="text-sm font-bold text-white">Auto Cutter Kertas</h4>
-                <p class="text-xs text-slate-400">Kirim perintah pemotong kertas (GS V 66 0) setelah foto selesai keluar</p>
+                <h4 class="text-sm font-bold text-black font-display">Auto Cutter Kertas</h4>
+                <p class="text-xs text-gray-600 font-mono">Kirim perintah pemotong kertas (GS V 66 0) setelah foto selesai keluar</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="cfg-auto-cut" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-black after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 border-2 border-black"></div>
               </label>
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-2">
-            <button type="button" id="btn-test-printer" class="px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer">
-              <span class="material-symbols-outlined text-[16px]">print</span>
+            <button type="button" id="btn-test-printer" class="px-4 py-2 rounded-lg bg-white hover:bg-gray-100 border-2 border-black text-black text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer shadow-[2px_2px_0px_#000]">
+              <span class="material-symbols-outlined text-[16px] text-emerald-600">print</span>
               <span>TEST CETAK THERMAL FEED</span>
             </button>
-            <span id="test-printer-status" class="text-xs font-mono text-slate-400"></span>
+            <span id="test-printer-status" class="text-xs font-mono text-gray-700 font-bold"></span>
           </div>
         </div>
 
         <!-- ================= TAB 4: RAW .ENV EDITOR ================= -->
         <div id="cfg-tab-raw" class="cfg-tab-content space-y-3 hidden">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-              <span>Direct File Editor: <strong class="text-slate-200">backend/.env</strong></span>
+            <span class="text-xs font-mono text-gray-700 flex items-center gap-1.5 font-bold">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+              <span>Direct File Editor: <strong class="text-black">backend/.env</strong></span>
             </span>
             <div class="flex items-center gap-2">
-              <button type="button" id="btn-copy-raw-env" class="px-3 py-1 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+              <button type="button" id="btn-copy-raw-env" class="px-3 py-1 rounded bg-white hover:bg-gray-100 border-2 border-black text-[11px] font-mono text-black font-bold transition-colors cursor-pointer shadow-[1px_1px_0px_#000] flex items-center gap-1">
                 <span class="material-symbols-outlined text-[14px]">content_copy</span>
                 <span>SALIN</span>
               </button>
-              <button type="button" id="btn-reset-default-env" class="px-3 py-1 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-amber-400 hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1">
+              <button type="button" id="btn-reset-default-env" class="px-3 py-1 rounded bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black text-[11px] font-mono text-black font-bold transition-colors cursor-pointer shadow-[1px_1px_0px_#000] flex items-center gap-1">
                 <span class="material-symbols-outlined text-[14px]">restart_alt</span>
                 <span>DEFAULT TEMPLATE</span>
               </button>
             </div>
           </div>
 
-          <textarea id="raw-env-textarea" rows="14" spellcheck="false" class="w-full p-4 rounded-xl bg-black/60 border border-white/10 font-mono text-xs text-emerald-400 leading-relaxed focus:outline-none focus:border-cyan-400 selection:bg-cyan-900 selection:text-white resize-y shadow-inner"></textarea>
-          <span class="text-[11px] text-slate-500 font-mono">
+          <textarea id="raw-env-textarea" rows="14" spellcheck="false" class="w-full p-4 rounded-xl bg-[#121212] border-2 border-black font-mono text-xs text-[#6bff83] leading-relaxed focus:outline-none resize-y shadow-inner"></textarea>
+          <span class="text-[11px] text-gray-600 font-mono">
             * Variabel di sini langsung sinkron ke backend server dan modul formulir di atas.
           </span>
         </div>
@@ -951,17 +925,17 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
-        <div class="text-xs font-mono text-slate-400 flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <div class="px-6 py-4 border-t-2 border-black bg-[#ebeae5] flex items-center justify-between">
+        <div class="text-xs font-mono text-gray-700 font-bold flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
           <span id="cfg-sync-status">Status: Tersinkronisasi</span>
         </div>
 
         <div class="flex items-center gap-3">
-          <button type="button" id="btn-cancel-config" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono font-bold text-slate-300 hover:text-white transition-colors cursor-pointer">
+          <button type="button" id="btn-cancel-config" class="px-4 py-2 rounded-xl bg-white hover:bg-gray-100 border-2 border-black text-xs font-mono font-bold text-black transition-colors cursor-pointer shadow-[2px_2px_0px_#000]">
             BATAL
           </button>
-          <button type="button" id="btn-save-config" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-mono text-xs font-bold shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center gap-2 transition-all cursor-pointer">
+          <button type="button" id="btn-save-config" class="px-5 py-2.5 rounded-xl bg-[#ffb703] hover:bg-[#ffc83b] border-2 border-black text-black font-mono text-xs font-black shadow-[3px_3px_0px_#000] flex items-center gap-2 transition-all cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none">
             <span class="material-symbols-outlined text-[16px]">save</span>
             <span>SIMPAN KONFIGURASI & .ENV</span>
           </button>
