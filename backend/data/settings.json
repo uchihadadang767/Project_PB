@@ -1,0 +1,12 @@
+{
+  "merchantName": "KREASI THERMAL PHOTOBOOTH",
+  "nmid": "ID102049281729",
+  "qrImage": "",
+  "price": 35000,
+  "currency": "Rp",
+  "priceFormatted": "Rp 35.000",
+  "paymentMode": "manual_acc",
+  "autoAccTimeout": 30,
+  "kioskName": "KIOSK #04",
+  "hardwareId": "TB-80MM-STATION-A9"
+}

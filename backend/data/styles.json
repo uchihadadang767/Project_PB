@@ -1,0 +1,52 @@
+[
+  {
+    "id": "bayer",
+    "name": "1-Bit Bayer Dithering",
+    "subtitle": "Classic 80mm POS Matrix",
+    "description": "Ordered 4x4 matrix dot pattern mimicking authentic thermal register printers.",
+    "active": true,
+    "isDefault": true,
+    "contrast": 150,
+    "brightness": 100
+  },
+  {
+    "id": "floyd",
+    "name": "Floyd-Steinberg Diffusion",
+    "subtitle": "Smooth Gradient Dispersion",
+    "description": "Error diffusion algorithm creating delicate gradients and soft facial tones.",
+    "active": true,
+    "isDefault": false,
+    "contrast": 135,
+    "brightness": 105
+  },
+  {
+    "id": "atkinson",
+    "name": "Atkinson Mac 1984",
+    "subtitle": "Vintage Macintosh UI",
+    "description": "Original Bill Atkinson 1984 dithering algorithm with punchy blacks and clean midtones.",
+    "active": true,
+    "isDefault": false,
+    "contrast": 140,
+    "brightness": 100
+  },
+  {
+    "id": "threshold",
+    "name": "High-Contrast Brutal",
+    "subtitle": "Pure 1-Bit Black & White",
+    "description": "Hard-edged monochrome cut without micro-dots. Industrial poster aesthetic.",
+    "active": true,
+    "isDefault": false,
+    "contrast": 180,
+    "brightness": 95
+  },
+  {
+    "id": "dotmatrix",
+    "name": "Dot Matrix Halftone",
+    "subtitle": "Newsprint Stencil",
+    "description": "Simulated ink ribbon pin-matrix dots with tangible tactile texture.",
+    "active": true,
+    "isDefault": false,
+    "contrast": 145,
+    "brightness": 100
+  }
+]

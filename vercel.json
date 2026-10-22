@@ -6,6 +6,18 @@
       "destination": "/backend/server.js"
     },
     {
+      "source": "/prints/(.*)",
+      "destination": "/backend/server.js"
+    },
+    {
+      "source": "/admin",
+      "destination": "/frontend/admin.html"
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": "/frontend/admin.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/$1"
     }

@@ -43,6 +43,9 @@ class KioskApp {
       autoResetTimerId: null
     };
 
+    this.orderPollTimerId = null;
+    this.adminConfig = null;
+
     this.samplePhotos = [
       'https://lh3.googleusercontent.com/aida-public/AB6AXuCYj7_pqGNUPn8XRL1xG2wNc_Ukz6XJ6X-T1RQHdYAOb9g_sY4u7UNEdUz8g_HKXk2KpOebjWnFm_aP6oPJ3XwPU7nvkr_mJsRdK7iN_YeAyMD9C-htjOWVcU49SjEZBJ-eBDcBhUw81j2CNS0GzIV5vAR_WKmY9l64q0gW_TzLHXV_7hSPBfqCLNilYmnaWKBuZ5IbCL8zcQQztlah-hwSOO1FM5m0kZwKaqKoUDHSB571z9iHwq7dhA',
       'https://lh3.googleusercontent.com/aida-public/AB6AXuDWUQvSUjmA9h331bxB90g4v3inlBUShAND9j9Zy4t0daCMtxZCkXoG5FgaBmK3UL5Xlf09Bp4cXi9vzicBtDmQtlQfb02svvtdFS1MjM69vmwVTz5bbAypmJsGefvsPj6KVopVU4cJaQP08FIUmEtbgAzBYU5w4-ZWPgedWdzO1REffYfmlphcFMpvdG65u06IM3osB22knKyzQ47zASsywDyOlTMZ9tpi4qcM7tqQJuXEEbSN5PBxKg',
@@ -56,6 +59,7 @@ class KioskApp {
     this.bindEvents();
     this.goToScreen('welcome');
     this.fetchSystemStatus();
+    this.fetchAdminConfig();
   }
 
   startClock() {
@@ -199,6 +203,11 @@ class KioskApp {
             mirrorBtn.click();
           }
         }
+      }
+
+      // Operator Admin Panel Shortcut: Ctrl + Shift + A
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        window.open('/admin', '_blank');
       }
     });
 
@@ -578,8 +587,11 @@ class KioskApp {
     if (screenId === 'payment') {
       this.startPaymentCountdown();
       this.updatePaymentSummary();
+      this.registerKioskOrder();
+      this.startOrderApprovalPolling();
     } else {
       this.stopPaymentCountdown();
+      this.stopOrderApprovalPolling();
     }
 
     if (screenId === 'customize') {
@@ -652,6 +664,98 @@ class KioskApp {
     if (this.state.paymentTimerId) {
       clearInterval(this.state.paymentTimerId);
       this.state.paymentTimerId = null;
+    }
+  }
+
+  async fetchAdminConfig() {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/config`);
+      if (res.ok) {
+        this.adminConfig = await res.json();
+        this.applyAdminConfig();
+      }
+    } catch (err) {
+      console.warn('Admin config fetch error:', err);
+    }
+  }
+
+  applyAdminConfig() {
+    if (!this.adminConfig || !this.adminConfig.settings) return;
+    const { qrImage, nmid, price, priceFormatted } = this.adminConfig.settings;
+
+    // Apply QR Image if set
+    const qrContainer = document.getElementById('kiosk-qris-container');
+    if (qrContainer && qrImage) {
+      qrContainer.innerHTML = `<img src="${qrImage}" alt="QRIS" class="w-full h-full object-contain">`;
+    }
+
+    // Apply NMID
+    const nmidEl = document.getElementById('kiosk-nmid-display');
+    if (nmidEl && nmid) {
+      nmidEl.textContent = `NMID: ${nmid}`;
+    }
+  }
+
+  async registerKioskOrder() {
+    try {
+      const res = await fetch(`${API_BASE}/api/session/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          frame: this.state.frame,
+          method: this.state.paymentMethod
+        })
+      });
+      const data = await res.json();
+      if (data && data.sessionId) {
+        this.state.session.id = data.sessionId;
+        this.state.session.txId = data.txId;
+        this.updateSessionDetails();
+      }
+    } catch (err) {
+      console.warn('Order registration error:', err);
+    }
+  }
+
+  startOrderApprovalPolling() {
+    this.stopOrderApprovalPolling();
+    // Poll every 2 seconds for operator ACC
+    this.orderPollTimerId = setInterval(async () => {
+      if (this.state.currentScreen !== 'payment') {
+        this.stopOrderApprovalPolling();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/session/status/${this.state.session.id}`);
+        const data = await res.json();
+
+        if (data && data.status === 'APPROVED') {
+          this.stopOrderApprovalPolling();
+          if (window.kioskAudio) window.kioskAudio.playChime();
+
+          const indicator = document.getElementById('kiosk-polling-indicator');
+          const pollingText = document.getElementById('kiosk-polling-text');
+          if (pollingText) {
+            pollingText.textContent = 'PAYMENT ACCEPTED BY OPERATOR! OPENING BOOTH...';
+          }
+          if (indicator) {
+            indicator.classList.remove('bg-surface-container');
+            indicator.classList.add('bg-secondary-container', 'text-on-secondary-container');
+          }
+
+          setTimeout(() => {
+            this.goToScreen('camera');
+          }, 900);
+        }
+      } catch (e) {}
+    }, 2000);
+  }
+
+  stopOrderApprovalPolling() {
+    if (this.orderPollTimerId) {
+      clearInterval(this.orderPollTimerId);
+      this.orderPollTimerId = null;
     }
   }
 

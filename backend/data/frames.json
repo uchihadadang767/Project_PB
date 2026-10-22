@@ -1,0 +1,54 @@
+[
+  {
+    "id": "classic-3",
+    "title": "CLASSIC 3-CUT STRIP",
+    "poses": 3,
+    "price": 35000,
+    "priceFormatted": "Rp 35.000",
+    "aspect": "1:1",
+    "tag": "3 Photo Poses",
+    "description": "Vertical strip with 3 square photos (1:1), timestamp header, cafe receipt style, standard 80mm roll.",
+    "borderStyle": "sawtooth",
+    "badge": "POPULAR",
+    "active": true
+  },
+  {
+    "id": "grid-4",
+    "title": "4-CUT GRID (2x2)",
+    "poses": 4,
+    "price": 35000,
+    "priceFormatted": "Rp 35.000",
+    "aspect": "1:1",
+    "tag": "4 Photo Poses",
+    "description": "Compact 2x2 grid format, polaroid mini vibe, rapid snap sequences for maximum pose variety.",
+    "borderStyle": "brutal",
+    "badge": "",
+    "active": true
+  },
+  {
+    "id": "wide-2",
+    "title": "WIDE DUO (1x2 CINEMATIC)",
+    "poses": 2,
+    "price": 30000,
+    "priceFormatted": "Rp 30.000",
+    "aspect": "4:3",
+    "tag": "2 Wide Poses",
+    "description": "2 cinematic landscape frames with extra thermal contrast and extended tear-off margins.",
+    "borderStyle": "minimal",
+    "badge": "NEW",
+    "active": true
+  },
+  {
+    "id": "maxi-6",
+    "title": "6-CUT MAXI DOCKET",
+    "poses": 6,
+    "price": 45000,
+    "priceFormatted": "Rp 45.000",
+    "aspect": "1:1",
+    "tag": "6 Photo Poses",
+    "description": "Extended archival receipt docket with 6 continuous snapshots. Perfect for groups and party reels.",
+    "borderStyle": "sawtooth",
+    "badge": "PRO",
+    "active": true
+  }
+]

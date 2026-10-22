@@ -1,0 +1,28 @@
+[
+  {
+    "id": "ORD-1792639828387",
+    "sessionId": "SESS-5040",
+    "txId": "TX-4467-ALPHA",
+    "frame": "TEST FRAME",
+    "poses": 3,
+    "amount": 35000,
+    "amountFormatted": "Rp 35.000",
+    "method": "QRIS",
+    "status": "APPROVED",
+    "createdAt": "2026-10-22T03:30:28.388Z",
+    "approvedAt": "2026-10-22T03:30:28.409Z"
+  },
+  {
+    "id": "ORD-1792638018",
+    "sessionId": "SESS-6996",
+    "txId": "TX-6996-ALPHA",
+    "frame": "CLASSIC 3-CUT STRIP",
+    "poses": 3,
+    "amount": 35000,
+    "amountFormatted": "Rp 35.000",
+    "method": "QRIS",
+    "status": "COMPLETED",
+    "createdAt": "2026-10-22T02:55:00.000Z",
+    "approvedAt": "2026-10-22T02:55:12.000Z"
+  }
+]
