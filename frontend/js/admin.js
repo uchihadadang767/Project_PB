@@ -1212,6 +1212,17 @@ class AdminApp {
     if (!modal) return;
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+
+    const isCloudHost = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const cloudWarningEl = document.getElementById('printer-cloud-warning');
+    if (cloudWarningEl) {
+      if (isCloudHost) {
+        cloudWarningEl.classList.remove('hidden');
+      } else {
+        cloudWarningEl.classList.add('hidden');
+      }
+    }
+
     await this.fetchAvailablePrinters();
     await this.loadEnvConfig();
   }
@@ -1525,6 +1536,17 @@ class AdminApp {
 
   async testPrinterFeed() {
     const statusEl = document.getElementById('test-printer-status');
+    const isCloudHost = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+
+    if (isCloudHost) {
+      if (statusEl) {
+        statusEl.textContent = 'Akses Ditolak: Printer USB fisik hanya dapat diakses melalui PC lokal di http://localhost:3000/admin';
+        statusEl.className = 'text-xs font-mono text-amber-600 font-bold';
+      }
+      this.showToast('Printer fisik ada di PC lokal! Buka http://localhost:3000/admin pada PC tempat kabel printer terhubung.', true);
+      return;
+    }
+
     const env = this.collectConfigForm();
     if (statusEl) {
       statusEl.textContent = 'Mengirim perintah feed test ke printer...';

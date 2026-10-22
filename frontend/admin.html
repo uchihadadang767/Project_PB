@@ -845,6 +845,19 @@
 
         <!-- ================= TAB 3: PRINTER THERMAL ================= -->
         <div id="cfg-tab-printer" class="cfg-tab-content space-y-4 hidden">
+          <div id="printer-cloud-warning" class="hidden p-3.5 rounded-lg bg-amber-100 border-2 border-black shadow-[2px_2px_0px_#000] text-black text-xs font-mono">
+            <div class="flex items-center gap-2 font-bold text-amber-900 mb-1">
+              <span class="material-symbols-outlined text-[18px]">warning</span>
+              <span>PERINGATAN: ANDA MEMBUKA ADMIN DI CLOUD (VERCEL)</span>
+            </div>
+            <p class="text-gray-800 leading-relaxed">
+              Printer thermal fisik terhubung via kabel USB ke PC/Laptop lokal Anda. Server cloud (Vercel) tidak memiliki akses ke port USB lokal.
+              <br>
+              Untuk mengontrol dan mencetak ke Thermal Printer fisik, <strong>buka sistem secara lokal di:</strong>
+              <a href="http://localhost:3000/admin" target="_blank" class="text-blue-700 underline font-bold">http://localhost:3000/admin</a>
+            </p>
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
             <div>
               <label class="block text-black mb-1.5 font-bold">PILIH PRINTER WINDOWS (TERHUBUNG)</label>
