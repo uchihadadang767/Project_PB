@@ -1,7 +1,8 @@
 param(
-    [Parameter(Mandatory=$true)]
-    [string]$ImagePath,
-    [string]$PrinterName = ""
+    [Parameter(Mandatory=$false)]
+    [string]$ImagePath = "",
+    [string]$PrinterName = "",
+    [switch]$TestFeed
 )
 
 $code = @'
@@ -9,6 +10,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 public class RawThermalPrinter {
     [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
@@ -63,6 +65,33 @@ public class RawThermalPrinter {
             ClosePrinter(hPrinter);
         }
         return false;
+    }
+
+    public static byte[] GenerateTestTicket(string printerName) {
+        using (MemoryStream ms = new MemoryStream()) {
+            // ESC @ (Init)
+            ms.Write(new byte[] { 0x1B, 0x40 }, 0, 2);
+            // ESC a 1 (Center align)
+            ms.Write(new byte[] { 0x1B, 0x61, 0x01 }, 0, 3);
+            // Double height ESC ! 0x10
+            ms.Write(new byte[] { 0x1B, 0x21, 0x10 }, 0, 3);
+            byte[] title = Encoding.ASCII.GetBytes("PHOTOBOOTH KIOSK\n");
+            ms.Write(title, 0, title.Length);
+            // Normal ESC ! 0x00
+            ms.Write(new byte[] { 0x1B, 0x21, 0x00 }, 0, 3);
+            byte[] sub = Encoding.ASCII.GetBytes("--- THERMAL PRINTER TEST ---\n\n");
+            ms.Write(sub, 0, sub.Length);
+            // ESC a 0 (Left align)
+            ms.Write(new byte[] { 0x1B, 0x61, 0x00 }, 0, 3);
+            string body = "Status  : HARDWARE ONLINE [OK]\nPrinter : " + printerName + "\nDate    : " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\nCutter  : TEST SUCCESS\n\n================================\n\n";
+            byte[] bodyBytes = Encoding.ASCII.GetBytes(body);
+            ms.Write(bodyBytes, 0, bodyBytes.Length);
+            // Feed 4 lines (ESC d 4)
+            ms.Write(new byte[] { 0x1B, 0x64, 0x04 }, 0, 3);
+            // Cut (GS V 0)
+            ms.Write(new byte[] { 0x1D, 0x56, 0x00 }, 0, 3);
+            return ms.ToArray();
+        }
     }
 
     public static byte[] ConvertImageToEscPos(string imagePath, int targetWidth) {
@@ -126,13 +155,6 @@ try {
         Add-Type -TypeDefinition $code -ReferencedAssemblies System.Drawing
     }
 
-    if (-not (Test-Path $ImagePath)) {
-        Write-Error "Image file not found: $ImagePath"
-        exit 1
-    }
-
-    $resolvedPath = (Resolve-Path $ImagePath).Path
-
     # Target printer priority:
     # 1. Parameter PrinterName if given and valid
     # 2. 'Thermal Printer' (created on USB004) if exists
@@ -149,6 +171,26 @@ try {
     }
 
     Write-Host "[PRINT-HELPER] Target Printer: $targetPrinter"
+
+    # If TestFeed requested, send test ticket immediately
+    if ($TestFeed) {
+        $testBytes = [RawThermalPrinter]::GenerateTestTicket($targetPrinter)
+        $rawSuccess = [RawThermalPrinter]::SendRawBytes($targetPrinter, $testBytes)
+        if ($rawSuccess) {
+            Write-Output "SUCCESS_TEST: Test ticket printed to $targetPrinter"
+            exit 0
+        } else {
+            Write-Error "RAW_PRINT_FAILED: Failed to send test ticket to $targetPrinter"
+            exit 1
+        }
+    }
+
+    if (-not (Test-Path $ImagePath)) {
+        Write-Error "Image file not found: $ImagePath"
+        exit 1
+    }
+
+    $resolvedPath = (Resolve-Path $ImagePath).Path
 
     # Step 1: Attempt direct RAW ESC/POS printing (Fastest, zero margin, direct head raster)
     try {

@@ -3,9 +3,9 @@
  * Manages Clean 5-Button Home Dashboard, Dedicated Sub-Pages, Orders ACC, QR Payment, Frame Geometry, Photo Styles, and Archives
  */
 
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:5000'
-  : '';
+const API_BASE = window.location.port === '5000'
+  ? ''
+  : (window.location.port === '3000' ? '' : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:5000' : ''));
 
 class AdminApp {
   constructor() {
@@ -1527,7 +1527,7 @@ class AdminApp {
     const statusEl = document.getElementById('test-printer-status');
     const env = this.collectConfigForm();
     if (statusEl) {
-      statusEl.textContent = 'Mengirim perintah feed test...';
+      statusEl.textContent = 'Mengirim perintah feed test ke printer...';
       statusEl.className = 'text-xs font-mono text-emerald-400 animate-pulse';
     }
 
@@ -1546,16 +1546,22 @@ class AdminApp {
       });
       const data = await res.json();
       if (statusEl) {
-        statusEl.textContent = data.message;
-        statusEl.className = `text-xs font-mono ${data.success ? 'text-emerald-400' : 'text-red-400'}`;
+        statusEl.textContent = data.message || (data.success ? 'Berhasil dikirim' : 'Gagal mencetak');
+        statusEl.className = `text-xs font-mono ${data.success ? 'text-emerald-500 font-bold' : 'text-red-500 font-bold'}`;
       }
-      if (window.kioskAudio) window.kioskAudio.playShutter();
-      this.showToast(data.message, !data.success);
+      try {
+        if (window.kioskAudio && typeof window.kioskAudio.playShutter === 'function') {
+          window.kioskAudio.playShutter();
+        }
+      } catch (audioErr) {}
+      this.showToast(data.message || (data.success ? 'Test feed berhasil' : 'Gagal test feed'), !data.success);
     } catch (err) {
+      console.error('Test printer error:', err);
       if (statusEl) {
-        statusEl.textContent = 'Gagal mengirim perintah test printer';
-        statusEl.className = 'text-xs font-mono text-red-400';
+        statusEl.textContent = `Gagal mengirim perintah: ${err.message || 'Koneksi error'}`;
+        statusEl.className = 'text-xs font-mono text-red-500 font-bold';
       }
+      this.showToast(`Gagal: ${err.message || 'Server backend tidak merespon'}`, true);
     }
   }
 }

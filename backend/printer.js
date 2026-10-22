@@ -12,6 +12,41 @@ const net = require('net');
 const PS_HELPER_PATH = path.join(__dirname, 'print_helper.ps1');
 
 /**
+ * Check if the thermal printer USB hardware is physically connected & powered on
+ */
+function checkPrinterHardwareStatus() {
+  return new Promise((resolve) => {
+    const psScript = `
+      $dev = Get-PnpDevice | Where-Object {
+        $_.Present -eq $true -and (
+          $_.InstanceId -like '*0FE6*' -or
+          $_.InstanceId -like '*USBPRINT*UNKNOWNPRINTER*' -or
+          $_.InstanceId -like '*USB004*' -or
+          ($_.Class -eq 'Printer' -and $_.FriendlyName -notlike '*PDF*' -and $_.FriendlyName -notlike '*XPS*' -and $_.FriendlyName -notlike '*Root*')
+        )
+      } | Select-Object -First 1 FriendlyName, InstanceId, Status
+      if ($dev) {
+        @{ present = $true; friendlyName = $dev.FriendlyName; instanceId = $dev.InstanceId } | ConvertTo-Json -Compress
+      } else {
+        @{ present = $false } | ConvertTo-Json -Compress
+      }
+    `;
+
+    execFile('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', psScript], { timeout: 6000 }, (err, stdout) => {
+      if (err || !stdout.trim()) {
+        return resolve({ present: false });
+      }
+      try {
+        const parsed = JSON.parse(stdout.trim());
+        resolve(parsed);
+      } catch (e) {
+        resolve({ present: false });
+      }
+    });
+  });
+}
+
+/**
  * Get list of installed Windows printers
  */
 function getInstalledPrinters() {
@@ -22,7 +57,7 @@ function getInstalledPrinters() {
       if (err || !stdout.trim()) {
         console.warn('[PRINTER] Failed to query printers via CIM, using fallback.');
         return resolve([
-          { name: 'Default Printer', isDefault: true }
+          { name: 'Thermal Printer', isDefault: true }
         ]);
       }
 
@@ -37,24 +72,39 @@ function getInstalledPrinters() {
         resolve(result);
       } catch (parseErr) {
         console.warn('[PRINTER] Error parsing printer list JSON:', parseErr.message);
-        resolve([{ name: 'Default Printer', isDefault: true }]);
+        resolve([{ name: 'Thermal Printer', isDefault: true }]);
       }
     });
   });
 }
 
 /**
- * Print an image file silently using Windows PrintDocument spooler
+ * Print an image file silently using Windows PrintDocument spooler & raw ESC/POS
  * @param {string} imagePath - Absolute path to the receipt image (.png)
  * @param {object} options - Options: printerName, paperWidth, autoCut
  */
-function printImageSilent(imagePath, options = {}) {
-  return new Promise((resolve, reject) => {
-    if (!fs.existsSync(imagePath)) {
-      return reject(new Error(`Receipt image file not found: ${imagePath}`));
-    }
+async function printImageSilent(imagePath, options = {}) {
+  if (!fs.existsSync(imagePath)) {
+    throw new Error(`Receipt image file not found: ${imagePath}`);
+  }
 
-    const printerName = options.printerName || '';
+  const printerName = options.printerName || 'Thermal Printer';
+
+  // Check hardware connection if targeting Thermal Printer
+  if (printerName.toLowerCase().includes('thermal') || !options.printerName) {
+    const hw = await checkPrinterHardwareStatus();
+    if (!hw.present) {
+      console.warn(`[PRINTER] Thermal Printer is NOT physically present on USB! (Power OFF or USB unplugged)`);
+      return {
+        success: false,
+        hardwareOffline: true,
+        error: 'Printer Thermal belum terdeteksi aktif di USB! Pastikan kabel USB terpasang kuat ke PC dan tombol power printer dinyalakan (ON).',
+        printerName
+      };
+    }
+  }
+
+  return new Promise((resolve) => {
     const args = [
       '-NoProfile',
       '-ExecutionPolicy',
@@ -67,7 +117,7 @@ function printImageSilent(imagePath, options = {}) {
       printerName
     ];
 
-    console.log(`[PRINTER] Dispatching silent thermal print job for: ${path.basename(imagePath)} (Target Printer: ${printerName || 'Default'})`);
+    console.log(`[PRINTER] Dispatching silent thermal print job for: ${path.basename(imagePath)} (Target Printer: ${printerName})`);
 
     execFile('powershell.exe', args, { timeout: 15000 }, (error, stdout, stderr) => {
       if (error) {
@@ -84,6 +134,61 @@ function printImageSilent(imagePath, options = {}) {
         success: true,
         message: stdout.trim(),
         printerName: printerName || 'Default System Printer'
+      });
+    });
+  });
+}
+
+/**
+ * Print a test strip receipt to verify USB thermal printer feed and cut
+ * @param {object} options - Options: printerName
+ */
+async function printTestReceipt(options = {}) {
+  const printerName = options.printerName || 'Thermal Printer';
+
+  // Check hardware connection if targeting thermal printer
+  if (printerName.toLowerCase().includes('thermal') || !options.printerName) {
+    const hw = await checkPrinterHardwareStatus();
+    if (!hw.present) {
+      console.warn(`[PRINTER] Thermal Printer is NOT physically present on USB! (Power OFF or USB unplugged)`);
+      return {
+        success: false,
+        hardwareOffline: true,
+        error: 'Printer Thermal belum terdeteksi aktif di USB! Pastikan kabel USB terpasang kuat ke PC dan tombol power printer dinyalakan (ON).',
+        printerName
+      };
+    }
+  }
+
+  return new Promise((resolve) => {
+    const args = [
+      '-NoProfile',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-File',
+      PS_HELPER_PATH,
+      '-PrinterName',
+      printerName,
+      '-TestFeed'
+    ];
+
+    console.log(`[PRINTER] Sending test receipt to: ${printerName}`);
+
+    execFile('powershell.exe', args, { timeout: 10000 }, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`[PRINTER] Test receipt error:`, error.message, stderr);
+        return resolve({
+          success: false,
+          error: stderr || error.message,
+          stdout
+        });
+      }
+
+      console.log(`[PRINTER] Test receipt sent successfully:`, stdout.trim());
+      resolve({
+        success: true,
+        message: stdout.trim(),
+        printerName
       });
     });
   });
@@ -117,7 +222,9 @@ function printNetworkEscPos(ip, port = 9100, buffer) {
 }
 
 module.exports = {
+  checkPrinterHardwareStatus,
   getInstalledPrinters,
   printImageSilent,
+  printTestReceipt,
   printNetworkEscPos
 };

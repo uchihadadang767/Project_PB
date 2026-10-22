@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const { getInstalledPrinters, printImageSilent } = require('./printer');
+const { getInstalledPrinters, printImageSilent, printTestReceipt } = require('./printer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -703,25 +703,18 @@ app.post('/api/admin/env/test-r2', async (req, res) => {
 app.post('/api/admin/env/test-printer', async (req, res) => {
   const { printerName, paperWidth, density, autoCut } = req.body;
   const settings = readJson('settings.json', {});
-  const target = printerName || settings.printerName || process.env.PRINTER_NAME || '';
+  const target = printerName || settings.printerName || process.env.PRINTER_NAME || 'Thermal Printer';
 
-  console.log(`[TEST-PRINTER] Test command requested for printer: "${target || 'Default System Printer'}"`);
+  console.log(`[TEST-PRINTER] Test command requested for printer: "${target}"`);
 
-  // Find any existing sample print file in PRINTS_DIR to test print
-  const files = fs.readdirSync(PRINTS_DIR).filter(f => f.endsWith('.png'));
-  if (files.length > 0) {
-    const testFile = path.join(PRINTS_DIR, files[0]);
-    const result = await printImageSilent(testFile, { printerName: target });
-    return res.json({
-      success: result.success,
-      message: result.success ? `Test print berhasil dikirim ke printer: ${result.printerName}` : `Gagal mencetak: ${result.error}`,
-      result
-    });
-  }
-
-  res.json({
-    success: true,
-    message: `Perintah feed test berhasil dikirim ke printer thermal (${paperWidth || '80mm'} - Target: ${target || 'Default'})`
+  const result = await printTestReceipt({ printerName: target, paperWidth, autoCut });
+  return res.json({
+    success: result.success,
+    hardwareOffline: Boolean(result.hardwareOffline),
+    message: result.success
+      ? `Test print strip berhasil dikirim ke printer: ${result.printerName}`
+      : `Gagal mencetak: ${result.error}`,
+    result
   });
 });
 
