@@ -626,14 +626,11 @@
 
         <!-- Viewfinder Viewport -->
         <div class="relative w-full mx-auto aspect-[4/5] max-h-[65vh] bg-primary-container overflow-hidden border-2 border-primary shadow-brutal-lg select-none flex items-center justify-center">
-          <!-- Real Webcam Video Element -->
-          <video id="camera-video" class="absolute inset-0 w-full h-full object-cover filter grayscale contrast-150" autoplay playsinline muted></video>
+          <!-- Real Webcam Video Element (Normal Color, Clean) -->
+          <video id="camera-video" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
 
           <!-- Fallback Simulated Canvas -->
-          <canvas id="camera-sim-canvas" class="absolute inset-0 w-full h-full object-cover filter grayscale contrast-150 hidden"></canvas>
-
-          <!-- Dot Matrix Raster Overlay -->
-          <div class="absolute inset-0 texture-dot-matrix-light opacity-15 pointer-events-none"></div>
+          <canvas id="camera-sim-canvas" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
 
           <!-- Framing Corners -->
           <div class="absolute top-4 left-4 w-8 h-8 pointer-events-none flex flex-col justify-between">
@@ -669,7 +666,7 @@
               <span>LIVE CAM</span>
             </div>
             <div class="bg-surface-container-lowest/90 text-primary font-label-sm px-2 py-0.5 font-bold border border-primary">
-              1-BIT BAYER
+              NATURAL COLOR
             </div>
           </div>
 

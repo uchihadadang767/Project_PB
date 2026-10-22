@@ -240,9 +240,7 @@ class KioskCamera {
     if (this.isLive && this.videoEl && this.videoEl.videoWidth) {
       canvas.width = this.videoEl.videoWidth;
       canvas.height = this.videoEl.videoHeight;
-      // Mirror image horizontally for photobooth selfie feel
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
+      // Normal camera capture without mirroring
       ctx.drawImage(this.videoEl, 0, 0, canvas.width, canvas.height);
     } else if (this.simCanvasEl) {
       canvas.width = this.simCanvasEl.width;
