@@ -1,5 +1,5 @@
 /**
- * Admin & Operator Terminal Controller
+ * Admin Dashboard Controller - Sleek Dark Theme
  * Manages Orders ACC, QR Payment, Frame Geometry, Photo Styles, and Archives
  */
 
@@ -50,13 +50,19 @@ class AdminApp {
 
     toastMsg.textContent = message;
     if (isError) {
-      toast.classList.remove('bg-primary', 'text-on-primary');
-      toast.classList.add('bg-error', 'text-on-error');
-      if (toastIcon) toastIcon.textContent = 'error';
+      toast.classList.remove('border-blue-500/40');
+      toast.classList.add('border-red-500/60');
+      if (toastIcon) {
+        toastIcon.textContent = 'error';
+        toastIcon.className = 'material-symbols-outlined text-red-400 text-[22px]';
+      }
     } else {
-      toast.classList.remove('bg-error', 'text-on-error');
-      toast.classList.add('bg-primary', 'text-on-primary');
-      if (toastIcon) toastIcon.textContent = 'check_circle';
+      toast.classList.remove('border-red-500/60');
+      toast.classList.add('border-blue-500/40');
+      if (toastIcon) {
+        toastIcon.textContent = 'check_circle';
+        toastIcon.className = 'material-symbols-outlined text-blue-400 text-[22px]';
+      }
     }
 
     toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
@@ -78,10 +84,11 @@ class AdminApp {
   }
 
   initTabs() {
-    const tabButtons = document.querySelectorAll('.admin-tab-btn');
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabId = btn.getAttribute('data-tab');
+    // Top 5 Squircle Cards
+    const navCards = document.querySelectorAll('.dashboard-nav-card');
+    navCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const tabId = card.getAttribute('data-tab');
         this.switchTab(tabId);
       });
     });
@@ -89,16 +96,17 @@ class AdminApp {
 
   switchTab(tabId) {
     this.currentTab = tabId;
-    document.querySelectorAll('.admin-tab-btn').forEach(b => {
-      if (b.getAttribute('data-tab') === tabId) {
-        b.classList.add('active', 'border-primary', 'bg-primary', 'text-on-primary');
-        b.classList.remove('border-transparent', 'text-on-surface');
+
+    // Highlight active card
+    document.querySelectorAll('.dashboard-nav-card').forEach(c => {
+      if (c.getAttribute('data-tab') === tabId) {
+        c.classList.add('active');
       } else {
-        b.classList.remove('active', 'border-primary', 'bg-primary', 'text-on-primary');
-        b.classList.add('border-transparent', 'text-on-surface');
+        c.classList.remove('active');
       }
     });
 
+    // Display corresponding section
     document.querySelectorAll('.admin-tab-content').forEach(content => {
       if (content.id === tabId) {
         content.classList.remove('hidden');
@@ -161,10 +169,10 @@ class AdminApp {
       const pendingOrders = this.orders.filter(o => o.status === 'PENDING');
       const pendingCount = pendingOrders.length;
 
-      // Play alert chime if a new pending order just arrived
+      // Play alert chime if a new pending order arrives
       if (isBackground && pendingCount > this.lastPendingCount && this.soundEnabled && window.kioskAudio) {
         window.kioskAudio.playChime();
-        this.showToast(`NEW ORDER AWAITING ACC! (${pendingOrders[0].sessionId})`);
+        this.showToast(`PESANAN BARU MENUNGGU ACC! (${pendingOrders[0].sessionId})`);
       }
       this.lastPendingCount = pendingCount;
 
@@ -218,8 +226,8 @@ class AdminApp {
     if (filtered.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" class="p-8 text-center text-on-surface-variant font-code-terminal">
-            No orders found matching filter: <strong>${this.activeFilter}</strong>
+          <td colspan="8" class="p-8 text-center text-slate-400 font-mono text-xs">
+            Tidak ada transaksi dengan filter: <strong>${this.activeFilter}</strong>
           </td>
         </tr>
       `;
@@ -233,38 +241,38 @@ class AdminApp {
 
       let statusBadge = '';
       if (isPending) {
-        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-error text-on-error font-bold text-xs uppercase animate-pulse border border-primary">● WAITING ACC</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold text-xs"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> MENUNGGU ACC</span>`;
       } else if (isApproved) {
-        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-secondary-container text-on-secondary-container font-bold text-xs uppercase border border-primary">✓ APPROVED</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold text-xs">✓ APPROVED</span>`;
       } else if (isCompleted) {
-        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-container-high text-primary font-bold text-xs uppercase border border-primary">PRINTED</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold text-xs">DICETAK</span>`;
       } else {
-        statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-container text-outline font-bold text-xs uppercase border border-primary">${order.status || 'UNKNOWN'}</span>`;
+        statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-white/5 font-bold text-xs">${order.status || 'UNKNOWN'}</span>`;
       }
 
       const orderTime = order.createdAt ? new Date(order.createdAt).toLocaleTimeString('id-ID') : '--:--';
 
       return `
-        <tr class="hover:bg-surface-container-low transition-colors ${isPending ? 'bg-error/5' : ''}">
-          <td class="p-3 font-bold text-primary">${order.txId || order.id}</td>
-          <td class="p-3 font-bold">${order.sessionId}</td>
-          <td class="p-3">${order.frame || 'Standard 3-Cut'}</td>
-          <td class="p-3 font-bold text-primary">${order.amountFormatted || 'Rp ' + Number(order.amount || 35000).toLocaleString('id-ID')}</td>
-          <td class="p-3 uppercase"><span class="px-1.5 py-0.5 bg-surface-container border border-primary/20 text-xs">${order.method || 'QRIS'}</span></td>
-          <td class="p-3 text-on-surface-variant">${orderTime}</td>
-          <td class="p-3">${statusBadge}</td>
-          <td class="p-3 text-right">
+        <tr class="hover:bg-white/[0.03] transition-colors ${isPending ? 'bg-amber-500/[0.04]' : ''}">
+          <td class="p-4 font-bold text-white">${order.txId || order.id}</td>
+          <td class="p-4 font-bold text-blue-400">${order.sessionId}</td>
+          <td class="p-4 text-slate-200">${order.frame || 'Standard 3-Cut'}</td>
+          <td class="p-4 font-bold text-emerald-400">${order.amountFormatted || 'Rp ' + Number(order.amount || 35000).toLocaleString('id-ID')}</td>
+          <td class="p-4"><span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[11px] text-slate-300 uppercase">${order.method || 'QRIS'}</span></td>
+          <td class="p-4 text-slate-400">${orderTime}</td>
+          <td class="p-4">${statusBadge}</td>
+          <td class="p-4 text-right">
             <div class="flex items-center justify-end gap-2">
               ${isPending ? `
-                <button class="btn-acc-order px-3 py-1.5 bg-primary text-on-primary hover:bg-primary-container border border-primary shadow-brutal-sm font-label-md text-xs uppercase font-bold flex items-center gap-1 cursor-pointer" data-id="${order.id}">
-                  <span class="material-symbols-outlined text-[16px] text-secondary-container">check_circle</span>
+                <button class="btn-acc-order px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-[0_0_15px_rgba(16,185,129,0.4)] text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" data-id="${order.id}">
+                  <span class="material-symbols-outlined text-[16px]">check_circle</span>
                   <span>ACC / APPROVE</span>
                 </button>
-                <button class="btn-reject-order px-2 py-1.5 bg-surface-container text-error hover:bg-error hover:text-white border border-primary font-label-md text-xs uppercase font-bold cursor-pointer" data-id="${order.id}" title="Reject Order">
+                <button class="btn-reject-order px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 text-xs font-bold transition-all cursor-pointer" data-id="${order.id}" title="Tolak Pesanan">
                   ✕
                 </button>
               ` : `
-                <span class="text-xs text-on-surface-variant font-bold uppercase">${order.status}</span>
+                <span class="text-xs text-slate-500 font-bold uppercase">${order.status}</span>
               `}
             </div>
           </td>
@@ -294,40 +302,40 @@ class AdminApp {
       const data = await res.json();
       if (data.success) {
         if (window.kioskAudio) window.kioskAudio.playShutter();
-        this.showToast(`ORDER #${id} APPROVED! KIOSK UNLOCKED.`);
+        this.showToast(`ORDER #${id} BERHASIL DI-ACC! KIOSK TERBUKA.`);
         await this.fetchOrders();
       }
     } catch (err) {
-      this.showToast('Failed to approve order', true);
+      this.showToast('Gagal menyetujui order', true);
     }
   }
 
   async rejectOrder(id) {
-    if (!confirm(`Are you sure you want to cancel order #${id}?`)) return;
+    if (!confirm(`Batalkan transaksi #${id}?`)) return;
     try {
       const res = await fetch(`${API_BASE}/api/admin/orders/reject/${id}`, { method: 'POST' });
       const data = await res.json();
       if (data.success) {
-        this.showToast(`Order #${id} marked as rejected`);
+        this.showToast(`Order #${id} dibatalkan`);
         await this.fetchOrders();
       }
     } catch (err) {
-      this.showToast('Failed to reject order', true);
+      this.showToast('Gagal membatalkan order', true);
     }
   }
 
-  // --- TAB 2: QR PAYMENT & TARIFF ---
+  // --- MODULE 2: QR PAYMENT & TARIFF ---
 
   initQrSection() {
     const filterButtons = document.querySelectorAll('.order-filter-btn');
     filterButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         filterButtons.forEach(b => {
-          b.classList.remove('bg-primary', 'text-on-primary');
-          b.classList.add('bg-surface-container', 'text-on-surface');
+          b.classList.remove('active', 'bg-blue-600', 'text-white');
+          b.classList.add('bg-white/5', 'text-slate-300');
         });
-        btn.classList.add('bg-primary', 'text-on-primary');
-        btn.classList.remove('bg-surface-container', 'text-on-surface');
+        btn.classList.add('active', 'bg-blue-600', 'text-white');
+        btn.classList.remove('bg-white/5', 'text-slate-300');
         this.activeFilter = btn.getAttribute('data-filter');
         this.renderOrdersTable();
       });
@@ -337,7 +345,7 @@ class AdminApp {
     if (refreshOrdersBtn) {
       refreshOrdersBtn.addEventListener('click', () => {
         this.fetchOrders();
-        this.showToast('Orders queue refreshed');
+        this.showToast('Antrean pesanan diperbarui');
       });
     }
 
@@ -358,7 +366,7 @@ class AdminApp {
             this.settings.qrImage = dataUrl;
             if (urlInput) urlInput.value = '';
             this.updateQrPreview();
-            this.showToast('QR code photo uploaded! Click Save to apply.');
+            this.showToast('Foto QRIS berhasil dipilih! Klik Simpan untuk menerapkan.');
           };
           reader.readAsDataURL(file);
         }
@@ -378,7 +386,7 @@ class AdminApp {
         if (urlInput) urlInput.value = '';
         if (fileInput) fileInput.value = '';
         this.updateQrPreview();
-        this.showToast('Reset to default vector QRIS code');
+        this.showToast('Di-reset ke template QRIS default');
       });
     }
 
@@ -430,10 +438,10 @@ class AdminApp {
           const data = await res.json();
           if (data.success) {
             this.settings = data.settings;
-            this.showToast('QR Payment settings and tariff saved to kiosk!');
+            this.showToast('Pengaturan QRIS & Tarif tersimpan ke Kiosk!');
           }
         } catch (err) {
-          this.showToast('Failed to save QR settings', true);
+          this.showToast('Gagal menyimpan pengaturan QR', true);
         }
       });
     }
@@ -473,7 +481,7 @@ class AdminApp {
       box.innerHTML = `<img src="${this.settings.qrImage}" alt="QRIS" class="w-full h-full object-contain">`;
     } else {
       box.innerHTML = `
-        <svg class="w-full h-full text-primary" fill="currentColor" viewBox="0 0 100 100">
+        <svg class="w-full h-full text-slate-900" fill="currentColor" viewBox="0 0 100 100">
           <rect height="28" width="28" x="5" y="5"></rect>
           <rect fill="#ffffff" height="20" width="20" x="9" y="9"></rect>
           <rect height="12" width="12" x="13" y="13"></rect>
@@ -485,7 +493,7 @@ class AdminApp {
           <rect height="12" width="12" x="13" y="75"></rect>
           <rect height="8" width="8" x="37" y="37"></rect>
           <rect height="8" width="8" x="57" y="37"></rect>
-          <rect height="12" width="12" x="45" y="45" fill="#ffb702"></rect>
+          <rect height="12" width="12" x="45" y="45" fill="#0284c7"></rect>
           <rect height="8" width="8" x="69" y="61"></rect>
           <rect height="8" width="8" x="77" y="81"></rect>
         </svg>
@@ -493,7 +501,7 @@ class AdminApp {
     }
   }
 
-  // --- TAB 3: FRAME MANAGEMENT ---
+  // --- MODULE 3: FRAME MANAGEMENT ---
 
   initFramesSection() {
     const openBtn = document.getElementById('btn-open-create-frame');
@@ -546,10 +554,10 @@ class AdminApp {
             this.frames = data.frames;
             this.renderFrames();
             modal.classList.add('hidden');
-            this.showToast('Frame template saved successfully!');
+            this.showToast('Template frame berhasil disimpan!');
           }
         } catch (err) {
-          this.showToast('Error saving frame', true);
+          this.showToast('Gagal menyimpan frame', true);
         }
       });
     }
@@ -571,7 +579,7 @@ class AdminApp {
       document.getElementById('modal-frame-badge').value = frame.badge || '';
       document.getElementById('modal-frame-active').checked = frame.active !== false;
     } else {
-      modalTitle.textContent = 'CREATE NEW FRAME TEMPLATE';
+      modalTitle.textContent = 'TAMBAH FRAME BARU';
       document.getElementById('modal-frame-id').value = '';
       document.getElementById('modal-frame-name').value = '';
       document.getElementById('modal-frame-desc').value = '';
@@ -592,45 +600,45 @@ class AdminApp {
 
     container.innerHTML = this.frames.map(frame => {
       return `
-        <div class="bg-surface-container-low border-2 border-primary p-5 shadow-brutal flex flex-col justify-between relative ${frame.active ? '' : 'opacity-60'}">
+        <div class="glass-panel rounded-2xl p-5 border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between relative ${frame.active ? '' : 'opacity-50'}">
           ${frame.badge ? `
-            <div class="absolute top-3 right-3 bg-secondary-container text-on-secondary-container font-label-sm text-[10px] font-bold px-1.5 py-0.5 border border-primary uppercase">
+            <div class="absolute top-4 right-4 bg-purple-500/20 text-purple-300 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-500/30 uppercase">
               ${frame.badge}
             </div>
           ` : ''}
 
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-1.5">
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full ${frame.active ? 'bg-tertiary-fixed-dim' : 'bg-outline'} inline-block"></span>
-              <h3 class="font-headline-md text-base uppercase font-bold text-primary">${frame.title}</h3>
+              <span class="w-2.5 h-2.5 rounded-full ${frame.active ? 'bg-emerald-400' : 'bg-slate-600'} inline-block"></span>
+              <h3 class="text-base font-bold text-white uppercase">${frame.title}</h3>
             </div>
-            <p class="font-body-md text-xs text-on-surface-variant line-clamp-2">${frame.description || 'Standard thermal continuous layout'}</p>
+            <p class="text-xs text-slate-400 line-clamp-2">${frame.description || 'Standard thermal continuous layout'}</p>
           </div>
 
           <!-- Mini Layout Representation -->
-          <div class="my-4 p-3 bg-surface-container border border-dashed border-primary flex justify-center items-center">
-            <div class="w-20 bg-surface-container-lowest border border-primary p-1.5 flex flex-col gap-1 shadow-sm">
-              <div class="h-1 bg-primary/20 w-3/4 mx-auto"></div>
+          <div class="my-4 p-3 rounded-xl bg-black/40 border border-white/5 flex justify-center items-center">
+            <div class="w-20 bg-white/5 border border-white/10 rounded-lg p-1.5 flex flex-col gap-1 shadow-sm">
+              <div class="h-1 bg-white/20 w-3/4 mx-auto rounded-full"></div>
               ${Array.from({ length: Math.min(frame.poses || 3, 4) }).map(() => `
-                <div class="aspect-square bg-surface-container-highest border border-primary/30 flex items-center justify-center text-[9px] font-code-terminal">📷</div>
+                <div class="aspect-square rounded bg-white/10 border border-white/10 flex items-center justify-center text-[10px]">📷</div>
               `).join('')}
             </div>
           </div>
 
-          <div class="pt-3 border-t border-primary/20 flex flex-col gap-3">
-            <div class="flex items-center justify-between font-code-terminal text-xs">
+          <div class="pt-3 border-t border-white/5 flex flex-col gap-3 font-mono text-xs">
+            <div class="flex items-center justify-between text-slate-300">
               <span>${frame.poses} POSES (${frame.aspect || '1:1'})</span>
-              <strong class="text-sm font-bold">${frame.priceFormatted || 'Rp ' + Number(frame.price).toLocaleString('id-ID')}</strong>
+              <strong class="text-sm font-bold text-emerald-400">${frame.priceFormatted || 'Rp ' + Number(frame.price).toLocaleString('id-ID')}</strong>
             </div>
 
             <div class="flex items-center justify-between gap-2 pt-1">
-              <button class="btn-toggle-frame flex-1 h-8 bg-surface-container hover:bg-surface-container-high border border-primary font-label-sm text-[10px] uppercase font-bold cursor-pointer" data-id="${frame.id}">
-                ${frame.active ? 'SET INACTIVE' : 'ACTIVATE'}
+              <button class="btn-toggle-frame flex-1 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-bold text-slate-200 transition-colors cursor-pointer" data-id="${frame.id}">
+                ${frame.active ? 'NONAKTIFKAN' : 'AKTIFKAN'}
               </button>
-              <button class="btn-edit-frame h-8 px-2.5 bg-surface-container hover:bg-surface-container-high border border-primary font-label-sm text-xs cursor-pointer" data-id="${frame.id}" title="Edit Frame">
+              <button class="btn-edit-frame h-8 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-blue-400 transition-colors cursor-pointer" data-id="${frame.id}" title="Edit Frame">
                 ✎
               </button>
-              <button class="btn-delete-frame h-8 px-2.5 bg-surface-container text-error hover:bg-error hover:text-white border border-primary font-label-sm text-xs cursor-pointer" data-id="${frame.id}" title="Delete Frame">
+              <button class="btn-delete-frame h-8 px-3 rounded-lg bg-white/5 hover:bg-red-500/20 text-xs text-red-400 transition-colors cursor-pointer" data-id="${frame.id}" title="Hapus Frame">
                 ✕
               </button>
             </div>
@@ -662,7 +670,7 @@ class AdminApp {
     container.querySelectorAll('.btn-delete-frame').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
-        if (confirm(`Delete frame template #${id}?`)) {
+        if (confirm(`Hapus frame template #${id}?`)) {
           await this.deleteFrame(id);
         }
       });
@@ -680,10 +688,10 @@ class AdminApp {
       if (data.success) {
         this.frames = data.frames;
         this.renderFrames();
-        this.showToast('Frame updated');
+        this.showToast('Frame berhasil diperbarui');
       }
     } catch (err) {
-      this.showToast('Error updating frame', true);
+      this.showToast('Gagal update frame', true);
     }
   }
 
@@ -694,14 +702,14 @@ class AdminApp {
       if (data.success) {
         this.frames = data.frames;
         this.renderFrames();
-        this.showToast('Frame deleted');
+        this.showToast('Frame dihapus');
       }
     } catch (err) {
-      this.showToast('Error deleting frame', true);
+      this.showToast('Gagal menghapus frame', true);
     }
   }
 
-  // --- TAB 4: PHOTO STYLES ---
+  // --- MODULE 4: PHOTO STYLES ---
 
   initStylesSection() {
     const saveBtn = document.getElementById('btn-save-styles');
@@ -715,10 +723,10 @@ class AdminApp {
           });
           const data = await res.json();
           if (data.success) {
-            this.showToast('Photo style dithering configuration saved!');
+            this.showToast('Konfigurasi photo styles tersimpan!');
           }
         } catch (err) {
-          this.showToast('Error saving styles', true);
+          this.showToast('Gagal menyimpan styles', true);
         }
       });
     }
@@ -730,36 +738,36 @@ class AdminApp {
 
     container.innerHTML = this.styles.map((style, idx) => {
       return `
-        <div class="bg-surface-container-lowest border-2 border-primary p-5 shadow-brutal flex flex-col justify-between gap-4">
+        <div class="glass-panel rounded-2xl p-6 border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between gap-4">
           <div class="flex items-start justify-between">
             <div>
-              <span class="font-code-terminal text-[10px] text-on-surface-variant uppercase font-bold">ALGORITHM #${idx + 1}</span>
-              <h3 class="font-headline-md text-base uppercase font-bold text-primary">${style.name}</h3>
-              <span class="font-label-sm text-xs text-secondary-container font-bold">${style.subtitle || ''}</span>
+              <span class="text-[10px] font-mono text-emerald-400 uppercase font-semibold">PRESET #${idx + 1}</span>
+              <h3 class="text-base font-bold text-white">${style.name}</h3>
+              <span class="text-xs text-slate-400">${style.subtitle || ''}</span>
             </div>
             ${style.isDefault ? `
-              <span class="px-2 py-0.5 bg-primary text-on-primary text-[10px] font-code-terminal font-bold uppercase">DEFAULT</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold uppercase">DEFAULT</span>
             ` : ''}
           </div>
 
-          <p class="font-body-md text-xs text-on-surface-variant">${style.description}</p>
+          <p class="text-xs text-slate-400 leading-relaxed">${style.description}</p>
 
-          <div class="p-3 bg-surface-container border border-primary flex flex-col gap-2 font-code-terminal text-xs">
-            <div class="flex justify-between items-center">
-              <span>THERMAL CONTRAST:</span>
-              <strong id="val-contrast-${style.id}">${style.contrast || 150}%</strong>
+          <div class="p-3.5 rounded-xl bg-black/40 border border-white/5 flex flex-col gap-2 font-mono text-xs">
+            <div class="flex justify-between items-center text-slate-300">
+              <span>KONTRAS THERMAL:</span>
+              <strong id="val-contrast-${style.id}" class="text-cyan-400">${style.contrast || 150}%</strong>
             </div>
-            <input type="range" min="100" max="250" value="${style.contrast || 150}" class="style-contrast-slider accent-primary w-full cursor-pointer" data-id="${style.id}">
+            <input type="range" min="100" max="250" value="${style.contrast || 150}" class="style-contrast-slider accent-blue-500 w-full cursor-pointer" data-id="${style.id}">
           </div>
 
-          <div class="flex items-center justify-between pt-2 border-t border-primary/20">
-            <label class="flex items-center gap-2 cursor-pointer font-label-sm text-xs font-bold uppercase">
-              <input type="checkbox" class="style-active-toggle w-4 h-4" data-id="${style.id}" ${style.active ? 'checked' : ''}>
-              <span>VISIBLE IN KIOSK</span>
+          <div class="flex items-center justify-between pt-2 border-t border-white/5 text-xs font-mono">
+            <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+              <input type="checkbox" class="style-active-toggle w-4 h-4 rounded accent-blue-500" data-id="${style.id}" ${style.active ? 'checked' : ''}>
+              <span>TAMPIL DI KIOSK</span>
             </label>
 
-            <button class="btn-make-default font-label-sm text-[10px] uppercase font-bold px-2 py-1 bg-surface-container hover:bg-surface-container-high border border-primary cursor-pointer" data-id="${style.id}">
-              ${style.isDefault ? '✓ ACTIVE DEFAULT' : 'SET AS DEFAULT'}
+            <button class="btn-make-default text-[11px] font-bold px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 transition-colors cursor-pointer" data-id="${style.id}">
+              ${style.isDefault ? '✓ AKTIF DEFAULT' : 'JADIKAN DEFAULT'}
             </button>
           </div>
         </div>
@@ -792,12 +800,12 @@ class AdminApp {
         const id = btn.getAttribute('data-id');
         this.styles.forEach(s => s.isDefault = (s.id === id));
         this.renderStyles();
-        this.showToast(`Default kiosk filter set to ${id.toUpperCase()}`);
+        this.showToast(`Filter default diubah ke ${id.toUpperCase()}`);
       });
     });
   }
 
-  // --- TAB 5: DATA FOTO & ARCHIVES ---
+  // --- MODULE 5: DATA FOTO & ARCHIVES ---
 
   initPhotosSection() {
     const refreshBtn = document.getElementById('btn-refresh-photos');
@@ -808,7 +816,7 @@ class AdminApp {
     if (refreshBtn) {
       refreshBtn.addEventListener('click', () => {
         this.fetchPhotos();
-        this.showToast('Photo archives refreshed');
+        this.showToast('Arsip foto diperbarui');
       });
     }
 
@@ -832,10 +840,8 @@ class AdminApp {
       const photos = await res.json();
       this.photos = Array.isArray(photos) ? photos : [];
 
-      const badge = document.getElementById('badge-total-photos');
       const countInd = document.getElementById('photo-count-indicator');
-      if (badge) badge.textContent = this.photos.length;
-      if (countInd) countInd.textContent = `ARCHIVED: ${this.photos.length} PRINTS`;
+      if (countInd) countInd.textContent = `ARSIP: ${this.photos.length} STRUK`;
 
       this.renderPhotos();
     } catch (err) {
@@ -859,10 +865,10 @@ class AdminApp {
 
     if (filtered.length === 0) {
       container.innerHTML = `
-        <div class="col-span-full p-12 bg-surface-container-low border-2 border-primary text-center">
-          <span class="material-symbols-outlined text-[48px] text-on-surface-variant block mb-2">image_not_supported</span>
-          <span class="font-headline-md text-lg uppercase font-bold text-primary">No Photo Prints Recorded Yet</span>
-          <p class="font-body-md text-xs text-on-surface-variant mt-1">Completed photobooth sessions will be stored here automatically.</p>
+        <div class="col-span-full p-12 glass-panel rounded-2xl border border-white/5 text-center">
+          <span class="material-symbols-outlined text-[48px] text-slate-500 block mb-2">image_not_supported</span>
+          <span class="text-base font-bold text-white uppercase">Belum Ada Struk Tercatat</span>
+          <p class="text-xs text-slate-400 mt-1">Sesi photobooth yang telah selesai dicetak akan otomatis masuk ke arsip ini.</p>
         </div>
       `;
       return;
@@ -875,36 +881,36 @@ class AdminApp {
       const imgUrl = item.fileUrl ? `${API_BASE}${item.fileUrl}` : '';
 
       return `
-        <div class="bg-surface-container-low border-2 border-primary p-3 shadow-brutal flex flex-col justify-between">
-          <div class="flex items-center justify-between pb-2 border-b border-primary/20 mb-2 font-code-terminal text-xs">
-            <span class="font-bold bg-primary text-on-primary px-1.5 py-0.5">${item.sessionId}</span>
-            <span class="text-on-surface-variant text-[10px]">${item.printId}</span>
+        <div class="glass-panel rounded-2xl p-3.5 border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between shadow-lg">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5 mb-2 font-mono text-xs">
+            <span class="font-bold text-blue-400">${item.sessionId}</span>
+            <span class="text-slate-500 text-[10px]">${item.printId}</span>
           </div>
 
           <!-- Thermal Receipt Thumbnail Preview -->
-          <div class="w-full bg-surface-container-highest border border-primary p-2 flex justify-center items-center overflow-hidden h-64 cursor-pointer btn-open-lightbox" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
+          <div class="w-full bg-black/50 rounded-xl p-2 flex justify-center items-center overflow-hidden h-64 cursor-pointer btn-open-lightbox border border-white/5 hover:border-white/20 transition-colors" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
             ${imgUrl ? `
-              <img src="${imgUrl}" alt="Strip" class="max-h-full object-contain shadow-brutal-sm hover:scale-105 transition-transform">
+              <img src="${imgUrl}" alt="Strip" class="max-h-full object-contain rounded shadow-lg hover:scale-105 transition-transform duration-200">
             ` : `
-              <div class="font-code-terminal text-xs text-on-surface-variant">No Image File</div>
+              <div class="font-mono text-xs text-slate-500">No Image</div>
             `}
           </div>
 
-          <div class="flex flex-col gap-1 my-2 font-code-terminal text-xs">
-            <span class="font-bold truncate text-primary uppercase">${frameName}</span>
-            <div class="flex justify-between text-[11px] text-on-surface-variant">
+          <div class="flex flex-col gap-1 my-2.5 font-mono text-xs">
+            <span class="font-bold truncate text-white uppercase">${frameName}</span>
+            <div class="flex justify-between text-[11px] text-slate-400">
               <span>${filterName}</span>
               <span>${dateStr.split(' ')[1] || ''}</span>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-1.5 pt-2 border-t border-primary/20">
-            <button class="btn-open-lightbox h-8 bg-surface-container hover:bg-surface-container-high border border-primary font-label-sm text-[10px] uppercase font-bold flex items-center justify-center gap-1 cursor-pointer" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
-              <span class="material-symbols-outlined text-[14px]">visibility</span>
-              <span>VIEW</span>
+          <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 font-mono text-xs">
+            <button class="btn-open-lightbox h-8 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-bold text-slate-200 flex items-center justify-center gap-1 transition-colors cursor-pointer" data-url="${imgUrl}" data-session="${item.sessionId}" data-date="${dateStr}" data-id="${item.printId}">
+              <span class="material-symbols-outlined text-[15px]">visibility</span>
+              <span>LIHAT</span>
             </button>
-            <a href="${imgUrl}" download="${item.printId || 'thermal-print'}.png" class="h-8 bg-primary text-on-primary hover:bg-primary-container border border-primary font-label-sm text-[10px] uppercase font-bold flex items-center justify-center gap-1 cursor-pointer">
-              <span class="material-symbols-outlined text-[14px]">download</span>
+            <a href="${imgUrl}" download="${item.printId || 'thermal-print'}.png" class="h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-[11px] font-bold text-white flex items-center justify-center gap-1 transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-[15px]">download</span>
               <span>PNG</span>
             </a>
           </div>
@@ -946,10 +952,10 @@ class AdminApp {
           const data = await res.json();
           if (data.success) {
             if (window.kioskAudio) window.kioskAudio.playShutter();
-            this.showToast(`Reprint triggered for session ${session}`);
+            this.showToast(`Reprint struk dikirim untuk sesi ${session}`);
           }
         } catch (e) {
-          this.showToast('Reprint command failed', true);
+          this.showToast('Gagal mengirim perintah reprint', true);
         }
       };
     }
