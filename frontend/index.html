@@ -90,7 +90,7 @@
   <!-- =========================================================================
        MAIN INTERACTION VIEWPORT
        ========================================================================= -->
-  <main class="w-full pt-6 pb-28 min-h-screen bg-surface">
+  <main class="w-full pt-6 pb-12 min-h-screen bg-surface">
 
     <!-- -----------------------------------------------------------------------
          SCREEN 1: WELCOME / IDLE (STANDBY)
@@ -1107,38 +1107,7 @@
 
   </main>
 
-  <!-- =========================================================================
-       PERSISTENT FOOTER WITH HARDWARE CONTROLS
-       ========================================================================= -->
-  <footer class="fixed bottom-0 left-0 right-0 z-40 bg-surface-container-low border-t-2 border-primary h-20 shadow-[0_-4px_0_0_#1c1b1b]">
-    <div class="h-full w-full px-4 sm:px-margin-kiosk flex items-center justify-between">
-      <div class="flex items-center gap-space-lg">
-        <div class="flex flex-col">
-          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">HARDWARE ID</span>
-          <span class="font-code-terminal text-code-terminal text-on-surface font-bold">TB-80MM-STATION-A9</span>
-        </div>
-        <span class="text-outline">/</span>
-        <div class="flex items-center gap-space-sm">
-          <div class="flex flex-col">
-            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">THERMAL PAPER CELL</span>
-            <div class="w-28 sm:w-36 h-3 bg-surface-container-high border border-primary relative overflow-hidden">
-              <div class="kiosk-paper-bar h-full bg-primary w-[94%]"></div>
-            </div>
-          </div>
-          <span class="kiosk-paper-pct font-label-md text-label-md text-on-surface font-bold">94%</span>
-        </div>
-      </div>
 
-      <div class="flex items-center gap-space-md">
-        <div class="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-label-sm">
-          <span class="material-symbols-outlined text-[16px]">speed</span> DENSITY: LEVEL 8 (HIGH)
-        </div>
-        <button id="btn-abort-session" class="h-12 px-space-md border-2 border-dashed border-error bg-error-container text-on-error-container font-label-md text-label-md hover:bg-error hover:text-on-error transition-all uppercase flex items-center gap-space-xs cursor-pointer font-bold" type="button">
-          [ ABORT / RESET SESSION ]
-        </button>
-      </div>
-    </div>
-  </footer>
 
   <!-- =========================================================================
        ABORT / RESET SESSION CONFIRMATION MODAL
