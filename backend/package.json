@@ -1,0 +1,14 @@
+{
+  "name": "thermal-photobooth-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Thermal Brutalism Photobooth Kiosk",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

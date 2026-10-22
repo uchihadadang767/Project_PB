@@ -1,0 +1,27 @@
+{
+  "name": "thermal-receipt-photobooth-kiosk",
+  "version": "1.0.0",
+  "description": "Thermal Brutalism Receipt Photobooth Kiosk with Separated Frontend and Backend",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "node --watch backend/server.js",
+    "client": "node --watch frontend/server.js",
+    "dev:backend": "node --watch backend/server.js",
+    "dev:frontend": "node --watch frontend/server.js",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,yellow\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
+  },
+  "keywords": [
+    "photobooth",
+    "kiosk",
+    "thermal-printer",
+    "receipt",
+    "brutalism"
+  ],
+  "dependencies": {
+    "concurrently": "^9.1.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

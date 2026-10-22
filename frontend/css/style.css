@@ -1,0 +1,209 @@
+/* ==========================================================================
+   Thermal Brutalism Kiosk - Custom Styling & Hardware Simulation
+   ========================================================================== */
+
+:root {
+  --surface: #faf9f5;
+  --surface-low: #f4f4f0;
+  --surface-high: #e8e8e4;
+  --primary: #121212;
+  --accent-amber: #ffb702;
+  --accent-green: #00ff66;
+  --accent-red: #ba1a1a;
+}
+
+/* Global Reset & Typography */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--primary);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overflow-x: hidden;
+}
+
+/* Custom Brutalist Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #dadad6;
+  border-left: 2px solid #121212;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #121212;
+  border: 1px solid #faf9f5;
+}
+
+/* Hard Drop Shadows (Mechanical Brutalism) */
+.shadow-brutal-sm {
+  box-shadow: 2px 2px 0px #121212;
+}
+
+.shadow-brutal {
+  box-shadow: 4px 4px 0px #121212;
+}
+
+.shadow-brutal-lg {
+  box-shadow: 6px 6px 0px #121212;
+}
+
+.shadow-brutal-amber {
+  box-shadow: 4px 4px 0px #ffb702;
+}
+
+.shadow-brutal-amber-lg {
+  box-shadow: 6px 6px 0px #ffb702;
+}
+
+/* Tactile Button Press Mechanics */
+.btn-press {
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn-press:active {
+  transform: translate(3px, 3px) !important;
+  box-shadow: 1px 1px 0px #121212 !important;
+}
+
+/* Serrated Receipt Guillotine Cut (Sawtooth Teeth) */
+.receipt-sawtooth-top {
+  position: relative;
+  overflow: hidden;
+  height: 12px;
+}
+
+.receipt-sawtooth-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background-size: 16px 12px;
+  background-repeat: repeat-x;
+  background-image: linear-gradient(135deg, var(--surface) 25%, transparent 25%),
+                    linear-gradient(225deg, var(--surface) 25%, transparent 25%);
+}
+
+.receipt-sawtooth-bottom {
+  position: relative;
+  overflow: hidden;
+  height: 12px;
+}
+
+.receipt-sawtooth-bottom::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background-size: 16px 12px;
+  background-repeat: repeat-x;
+  background-image: linear-gradient(45deg, var(--surface) 25%, transparent 25%),
+                    linear-gradient(315deg, var(--surface) 25%, transparent 25%);
+}
+
+/* Halftone / Dot-Matrix Grid Texture */
+.texture-dot-matrix {
+  background-image: radial-gradient(#121212 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+.texture-dot-matrix-light {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+/* Thermal Paper Texture */
+.thermal-paper {
+  background-color: #fbfbf7;
+  border: 2px solid #121212;
+  box-shadow: 6px 6px 0px #121212;
+  position: relative;
+}
+
+/* Screen Transitions */
+.kiosk-screen {
+  display: none;
+  opacity: 0;
+  transform: scale(0.99);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.kiosk-screen.active {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Printer Slot Dispense Animation */
+@keyframes dispenseSlide {
+  0% {
+    transform: translateY(-85%);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-40%);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.dispensing-animation {
+  animation: dispenseSlide 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Laser Scanner Beam */
+@keyframes laserScan {
+  0% {
+    top: 5%;
+    opacity: 0.3;
+  }
+  50% {
+    top: 90%;
+    opacity: 1;
+  }
+  100% {
+    top: 5%;
+    opacity: 0.3;
+  }
+}
+
+.laser-beam {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  background-color: #ffb702;
+  box-shadow: 0 0 10px #ffb702, 0 0 4px #fff;
+  animation: laserScan 2.4s ease-in-out infinite;
+}
+
+/* Flash Emitter */
+#camera-flash-overlay {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease-out;
+}
+
+#camera-flash-overlay.flashing {
+  opacity: 1;
+}
+
+/* Custom modal backdrop */
+.modal-backdrop {
+  background-color: rgba(18, 18, 18, 0.75);
+  backdrop-filter: blur(2px);
+}
