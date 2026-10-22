@@ -3,9 +3,28 @@
  * Manages Clean 5-Button Home Dashboard, Dedicated Sub-Pages, Orders ACC, QR Payment, Frame Geometry, Photo Styles, and Archives
  */
 
-const API_BASE = window.location.port === '5000'
-  ? ''
-  : (window.location.port === '3000' ? '' : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:5000' : ''));
+const DEFAULT_BRIDGE_URL = 'https://photobooth-kiosk-local.loca.lt';
+
+function resolveApiBase() {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return window.location.port === '5000' ? '' : (window.location.port === '3000' ? '' : 'http://localhost:5000');
+  }
+  const custom = localStorage.getItem('kiosk_api_base_url');
+  return custom ? custom.trim().replace(/\/+$/, '') : DEFAULT_BRIDGE_URL;
+}
+
+const API_BASE = resolveApiBase();
+
+// Auto inject bypass-tunnel-reminder header for localtunnel bridge
+const _origFetch = window.fetch;
+window.fetch = function(url, options = {}) {
+  options = options || {};
+  options.headers = {
+    'bypass-tunnel-reminder': 'true',
+    ...(options.headers || {})
+  };
+  return _origFetch.call(this, url, options);
+};
 
 class AdminApp {
   constructor() {
@@ -1218,6 +1237,8 @@ class AdminApp {
     if (cloudWarningEl) {
       if (isCloudHost) {
         cloudWarningEl.classList.remove('hidden');
+        const displayEl = document.getElementById('bridge-url-display');
+        if (displayEl) displayEl.textContent = API_BASE;
       } else {
         cloudWarningEl.classList.add('hidden');
       }
@@ -1474,6 +1495,9 @@ class AdminApp {
       const data = await res.json();
 
       if (data.success) {
+        if (payload.env && payload.env.API_BASE_URL) {
+          localStorage.setItem('kiosk_api_base_url', payload.env.API_BASE_URL);
+        }
         this.showToast('Konfigurasi .env berhasil disimpan & disinkronkan!');
         if (data.rawEnv) {
           const textarea = document.getElementById('raw-env-textarea');
@@ -1536,20 +1560,9 @@ class AdminApp {
 
   async testPrinterFeed() {
     const statusEl = document.getElementById('test-printer-status');
-    const isCloudHost = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-
-    if (isCloudHost) {
-      if (statusEl) {
-        statusEl.textContent = 'Akses Ditolak: Printer USB fisik hanya dapat diakses melalui PC lokal di http://localhost:3000/admin';
-        statusEl.className = 'text-xs font-mono text-amber-600 font-bold';
-      }
-      this.showToast('Printer fisik ada di PC lokal! Buka http://localhost:3000/admin pada PC tempat kabel printer terhubung.', true);
-      return;
-    }
-
     const env = this.collectConfigForm();
     if (statusEl) {
-      statusEl.textContent = 'Mengirim perintah feed test ke printer...';
+      statusEl.textContent = 'Mengirim perintah feed test ke printer via bridge...';
       statusEl.className = 'text-xs font-mono text-emerald-500 animate-pulse font-bold';
     }
 

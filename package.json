@@ -10,6 +10,7 @@
     "dev:backend": "node --watch backend/server.js",
     "dev:frontend": "node --watch frontend/server.js",
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,yellow\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "bridge": "node backend/bridge_tunnel.js",
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
   },
   "keywords": [

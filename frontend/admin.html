@@ -845,16 +845,15 @@
 
         <!-- ================= TAB 3: PRINTER THERMAL ================= -->
         <div id="cfg-tab-printer" class="cfg-tab-content space-y-4 hidden">
-          <div id="printer-cloud-warning" class="hidden p-3.5 rounded-lg bg-amber-100 border-2 border-black shadow-[2px_2px_0px_#000] text-black text-xs font-mono">
-            <div class="flex items-center gap-2 font-bold text-amber-900 mb-1">
-              <span class="material-symbols-outlined text-[18px]">warning</span>
-              <span>PERINGATAN: ANDA MEMBUKA ADMIN DI CLOUD (VERCEL)</span>
+          <div id="printer-cloud-warning" class="hidden p-3.5 rounded-lg bg-emerald-50 border-2 border-black shadow-[2px_2px_0px_#000] text-black text-xs font-mono">
+            <div class="flex items-center gap-2 font-bold text-emerald-900 mb-1">
+              <span class="material-symbols-outlined text-[18px] text-emerald-600">cloud_sync</span>
+              <span>VERCEL CLOUD TERHUBUNG KE PRINTER USB LOKAL</span>
             </div>
             <p class="text-gray-800 leading-relaxed">
-              Printer thermal fisik terhubung via kabel USB ke PC/Laptop lokal Anda. Server cloud (Vercel) tidak memiliki akses ke port USB lokal.
-              <br>
-              Untuk mengontrol dan mencetak ke Thermal Printer fisik, <strong>buka sistem secara lokal di:</strong>
-              <a href="http://localhost:3000/admin" target="_blank" class="text-blue-700 underline font-bold">http://localhost:3000/admin</a>
+              Kiosk Vercel terhubung ke USB Printer laptop Anda via bridge:
+              <span id="bridge-url-display" class="font-bold text-emerald-700 bg-white px-2 py-0.5 border border-black rounded">https://photobooth-kiosk-local.loca.lt</span>.
+              Perintah cetak dari Vercel otomatis diteruskan langsung ke printer thermal fisik tanpa popup!
             </p>
           </div>
 

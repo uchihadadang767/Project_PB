@@ -5,9 +5,29 @@
 
 // Backend API Base URL
 // Local dev (port 3000) -> connects to backend (http://localhost:5000).
-// Production / Vercel -> uses relative path '' so all /api/* requests route seamlessly.
-const isLocalDev = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '5000';
-const API_BASE = isLocalDev ? 'http://localhost:5000' : '';
+// Production / Vercel -> connects to local thermal printer bridge via HTTPS tunnel.
+const DEFAULT_BRIDGE_URL = 'https://photobooth-kiosk-local.loca.lt';
+
+function resolveApiBase() {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return window.location.port === '5000' ? '' : 'http://localhost:5000';
+  }
+  const custom = localStorage.getItem('kiosk_api_base_url');
+  return custom ? custom.trim().replace(/\/+$/, '') : DEFAULT_BRIDGE_URL;
+}
+
+const API_BASE = resolveApiBase();
+
+// Auto inject bypass-tunnel-reminder header for localtunnel bridge
+const _origFetch = window.fetch;
+window.fetch = function(url, options = {}) {
+  options = options || {};
+  options.headers = {
+    'bypass-tunnel-reminder': 'true',
+    ...(options.headers || {})
+  };
+  return _origFetch.call(this, url, options);
+};
 
 class KioskApp {
   constructor() {
