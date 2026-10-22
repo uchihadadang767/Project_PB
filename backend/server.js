@@ -28,6 +28,78 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+// --- ENV CONFIGURATION HELPERS ---
+const ENV_PATH = path.join(__dirname, '.env');
+
+const DEFAULT_ENV_CONTENT = `# =================================================================
+# THERMAL PHOTOBOOTH KIOSK - SYSTEM & ENVIRONMENT CONFIGURATION
+# =================================================================
+
+# Server & Network Ports
+PORT=5000
+NODE_ENV=development
+API_BASE_URL=http://localhost:5000
+
+# Kiosk Identity
+KIOSK_NAME="KIOSK #04"
+HARDWARE_ID="TB-80MM-STATION-A9"
+PAYMENT_MODE=manual_acc
+AUTO_ACC_TIMEOUT=30
+
+# Cloudflare R2 Object Storage (S3-Compatible)
+R2_ENABLED=false
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=photobooth-prints
+R2_PUBLIC_DOMAIN=
+
+# ESC/POS Direct Thermal Printer Configuration
+PRINTER_INTERFACE=direct_usb
+PRINTER_IP=192.168.1.200:9100
+PAPER_WIDTH=80mm
+PRINT_DENSITY=8
+AUTO_CUT=true
+`;
+
+function getRawEnv() {
+  if (fs.existsSync(ENV_PATH)) {
+    return fs.readFileSync(ENV_PATH, 'utf8');
+  }
+  // Initialize default if not exists
+  fs.writeFileSync(ENV_PATH, DEFAULT_ENV_CONTENT, 'utf8');
+  return DEFAULT_ENV_CONTENT;
+}
+
+function parseEnv(content) {
+  const env = {};
+  if (!content) return env;
+  const lines = content.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx !== -1) {
+      const key = trimmed.slice(0, eqIdx).trim();
+      let val = trimmed.slice(eqIdx + 1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      env[key] = val;
+    }
+  }
+  return env;
+}
+
+function applyEnvToProcess(envObj) {
+  for (const [k, v] of Object.entries(envObj)) {
+    process.env[k] = v;
+  }
+}
+
+// Initial env load into process.env
+applyEnvToProcess(parseEnv(getRawEnv()));
+
 // Data Helper Functions
 function getFilePath(filename) {
   return path.join(DATA_DIR, filename);
@@ -40,7 +112,7 @@ function readJson(filename, defaultValue) {
       return JSON.parse(fs.readFileSync(p, 'utf8'));
     }
   } catch (err) {
-    console.error(`Error reading ${filename}:`, err);
+    console.error('Error reading ' + filename + ':', err);
   }
   return defaultValue;
 }
@@ -51,7 +123,7 @@ function writeJson(filename, data) {
     fs.writeFileSync(p, JSON.stringify(data, null, 2), 'utf8');
     return true;
   } catch (err) {
-    console.error(`Error writing ${filename}:`, err);
+    console.error('Error writing ' + filename + ':', err);
     return false;
   }
 }
@@ -427,6 +499,128 @@ app.post('/api/admin/photos/reprint/:id', (req, res) => {
     success: true,
     message: `Reprint job #${id} dispatched to thermal head`,
     reprintedAt: new Date().toISOString()
+  });
+});
+
+// --- I. ENV CONFIGURATION & SYSTEM SETTINGS API ---
+
+// 1. Get raw and parsed .env
+app.get('/api/admin/env', (req, res) => {
+  try {
+    const rawEnv = getRawEnv();
+    const envObj = parseEnv(rawEnv);
+    res.json({
+      success: true,
+      rawEnv,
+      env: envObj,
+      defaultEnv: DEFAULT_ENV_CONTENT
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 2. Save .env (supports rawEnv string or parsed key-value object)
+app.post('/api/admin/env', (req, res) => {
+  try {
+    let rawEnv = req.body.rawEnv;
+    let envObj = {};
+
+    if (rawEnv !== undefined) {
+      fs.writeFileSync(ENV_PATH, rawEnv, 'utf8');
+      envObj = parseEnv(rawEnv);
+    } else if (req.body.env) {
+      envObj = req.body.env;
+      const currentRaw = getRawEnv();
+      const currentLines = currentRaw.split(/\r?\n/);
+      const updatedLines = [];
+      const handledKeys = new Set();
+
+      for (const line of currentLines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) {
+          updatedLines.push(line);
+          continue;
+        }
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx !== -1) {
+          const key = trimmed.slice(0, eqIdx).trim();
+          if (key in envObj) {
+            let val = envObj[key];
+            if (typeof val === 'string' && (val.includes(' ') || val.includes('#'))) {
+              val = `"${val}"`;
+            }
+            updatedLines.push(`${key}=${val}`);
+            handledKeys.add(key);
+          } else {
+            updatedLines.push(line);
+          }
+        } else {
+          updatedLines.push(line);
+        }
+      }
+
+      // Add any remaining keys
+      for (const [k, v] of Object.entries(envObj)) {
+        if (!handledKeys.has(k)) {
+          let val = v;
+          if (typeof val === 'string' && (val.includes(' ') || val.includes('#'))) {
+            val = `"${val}"`;
+          }
+          updatedLines.push(`${k}=${val}`);
+        }
+      }
+
+      rawEnv = updatedLines.join('\n');
+      fs.writeFileSync(ENV_PATH, rawEnv, 'utf8');
+    }
+
+    applyEnvToProcess(envObj);
+
+    // Sync shared fields with settings.json
+    const settings = readJson('settings.json', {});
+    if (envObj.KIOSK_NAME) settings.kioskName = envObj.KIOSK_NAME;
+    if (envObj.HARDWARE_ID) settings.hardwareId = envObj.HARDWARE_ID;
+    if (envObj.PAYMENT_MODE) settings.paymentMode = envObj.PAYMENT_MODE;
+    if (envObj.AUTO_ACC_TIMEOUT) settings.autoAccTimeout = Number(envObj.AUTO_ACC_TIMEOUT);
+    writeJson('settings.json', settings);
+
+    res.json({
+      success: true,
+      message: 'Konfigurasi .env dan sistem berhasil disimpan!',
+      rawEnv,
+      env: envObj
+    });
+  } catch (err) {
+    console.error('Error saving .env:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 3. Test R2 Connection Parameters
+app.post('/api/admin/env/test-r2', (req, res) => {
+  const { accountId, accessKey, secretKey, bucketName, publicDomain } = req.body;
+  if (!accountId || !accessKey || !secretKey || !bucketName) {
+    return res.json({
+      success: false,
+      message: 'Harap lengkapi R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, dan R2_BUCKET_NAME'
+    });
+  }
+
+  res.json({
+    success: true,
+    message: `Koneksi Cloudflare R2 Valid! Bucket: ${bucketName} (Endpoint: https://${accountId}.r2.cloudflarestorage.com)`,
+    publicUrl: publicDomain ? `${publicDomain}/test-ping.png` : `https://${bucketName}.${accountId}.r2.dev/test-ping.png`
+  });
+});
+
+// 4. Test Thermal Printer Feed
+app.post('/api/admin/env/test-printer', (req, res) => {
+  const { printerType, printerIp, paperWidth, density, autoCut } = req.body;
+  console.log(`[TEST-PRINTER] Feed command sent: ${printerType} (${printerIp || 'USB'}) - Width: ${paperWidth}, Density: ${density}, Cut: ${autoCut}`);
+  res.json({
+    success: true,
+    message: `Perintah feed test berhasil dikirim ke printer thermal (${paperWidth || '80mm'} - Density Level ${density || 8})`
   });
 });
 

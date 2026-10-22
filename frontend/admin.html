@@ -173,6 +173,12 @@
           <span id="sound-text" class="hidden sm:inline">CHIME ON</span>
         </button>
 
+        <!-- Tombol Konfigurasi (.env & System) -->
+        <button id="btn-open-config" class="h-9 px-3.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-500/50 flex items-center gap-2 text-xs font-mono font-bold text-slate-200 hover:text-white transition-all cursor-pointer group shadow-sm" type="button" title="Buka Konfigurasi Sistem & Environment (.env)">
+          <span class="material-symbols-outlined text-[18px] text-cyan-400 group-hover:rotate-90 transition-transform duration-300">tune</span>
+          <span class="tracking-wide">KONFIGURASI</span>
+        </button>
+
         <a href="/" target="_blank" class="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.35)] flex items-center gap-2 text-xs font-bold text-white transition-all cursor-pointer">
           <span>BUKA KIOSK</span>
           <span class="material-symbols-outlined text-[16px]">open_in_new</span>
@@ -700,6 +706,264 @@
     </div>
 
   </main>
+
+  <!-- =========================================================================
+       SYSTEM & ENVIRONMENT (.ENV) CONFIGURATION MODAL
+       ========================================================================= -->
+  <div id="modal-config" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-6 transition-all duration-300">
+    <div class="glass-panel rounded-2xl max-w-4xl w-full border border-white/15 relative max-h-[92vh] flex flex-col shadow-[0_25px_60px_rgba(0,0,0,0.9)] overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl glow-cyan flex items-center justify-center text-white">
+            <span class="material-symbols-outlined text-[22px]">tune</span>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <span>Konfigurasi Sistem & Environment</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">.ENV</span>
+            </h2>
+            <p class="text-xs text-slate-400 font-sans">
+              Kelola Cloudflare R2 storage, identitas kiosk booth, printer thermal 80mm, dan variabel .env
+            </p>
+          </div>
+        </div>
+        <button id="btn-close-config" type="button" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors cursor-pointer" title="Tutup Modal">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Tabs Navigation -->
+      <div class="flex items-center gap-2 px-6 pt-3 border-b border-white/10 bg-black/20 overflow-x-auto text-xs font-mono">
+        <button type="button" class="cfg-subtab active px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-r2">
+          <span class="material-symbols-outlined text-[16px]">cloud_upload</span>
+          <span>CLOUDFLARE R2</span>
+        </button>
+        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-kiosk">
+          <span class="material-symbols-outlined text-[16px]">terminal</span>
+          <span>KIOSK & SERVER</span>
+        </button>
+        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-printer">
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          <span>PRINTER THERMAL</span>
+        </button>
+        <button type="button" class="cfg-subtab px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer transition-colors" data-cfg-tab="cfg-tab-raw">
+          <span class="material-symbols-outlined text-[16px]">code</span>
+          <span>RAW .ENV EDITOR</span>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm">
+        
+        <!-- ================= TAB 1: CLOUDFLARE R2 ================= -->
+        <div id="cfg-tab-r2" class="cfg-tab-content space-y-5">
+          <div class="p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/20 flex items-start gap-3">
+            <span class="material-symbols-outlined text-cyan-400 text-[24px] mt-0.5">info</span>
+            <div class="text-xs text-slate-300 leading-relaxed font-sans">
+              <strong class="text-white font-semibold">Cloudflare R2 Object Storage (S3-Compatible):</strong>
+              Foto strip 80mm yang diambil dari kiosk otomatis diunggah ke Cloudflare R2 bucket. R2 gratis transfer keluar (Zero Egress Fees) & menyediakan URL download instan via barcode QR di struk.
+            </div>
+          </div>
+
+          <!-- R2 Enabled Switch -->
+          <div class="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div>
+              <h4 class="text-sm font-bold text-white">Sinkronisasi Cloudflare R2</h4>
+              <p class="text-xs text-slate-400">Aktifkan pengunggahan otomatis master photo strip ke bucket R2</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="cfg-r2-enabled" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">R2_ACCOUNT_ID</label>
+              <input type="text" id="cfg-r2-account-id" placeholder="e.g. 7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <span class="text-[10px] text-slate-500">Ditemukan di dashboard Cloudflare > R2 Overview (sebelah kanan)</span>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">R2_BUCKET_NAME</label>
+              <input type="text" id="cfg-r2-bucket-name" placeholder="photobooth-prints" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <span class="text-[10px] text-slate-500">Nama bucket R2 yang sudah dibuat di Cloudflare</span>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">R2_ACCESS_KEY_ID</label>
+              <input type="text" id="cfg-r2-access-key" placeholder="e.g. 4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <span class="text-[10px] text-slate-500">Dibuat dari menu 'Manage R2 API Tokens' (Permission: Object Read & Write)</span>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">R2_SECRET_ACCESS_KEY</label>
+              <div class="relative">
+                <input type="password" id="cfg-r2-secret-key" placeholder="••••••••••••••••••••••••" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors pr-10">
+                <button type="button" id="btn-toggle-secret-key" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-white" title="Lihat/Sembunyikan">
+                  <span class="material-symbols-outlined text-[18px]">visibility</span>
+                </button>
+              </div>
+              <span class="text-[10px] text-slate-500">Secret key dari token API Cloudflare R2</span>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-slate-300 mb-1.5 font-bold">R2_PUBLIC_DOMAIN / CUSTOM DOMAIN (URL PUBLIK)</label>
+              <input type="text" id="cfg-r2-public-domain" placeholder="https://pub-xxxxxx.r2.dev atau https://cdn.photobooth.com" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <span class="text-[10px] text-slate-500">Domain publik R2 atau custom domain yang aktif untuk membuka gambar di struk</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <button type="button" id="btn-test-r2" class="px-4 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">network_check</span>
+              <span>TEST KONEKSI R2</span>
+            </button>
+            <span id="test-r2-status" class="text-xs font-mono text-slate-400"></span>
+          </div>
+        </div>
+
+        <!-- ================= TAB 2: KIOSK & SERVER ================= -->
+        <div id="cfg-tab-kiosk" class="cfg-tab-content space-y-4 hidden">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">PORT SERVER BACKEND</label>
+              <input type="number" id="cfg-server-port" placeholder="5000" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">API_BASE_URL (FRONTEND KE BACKEND)</label>
+              <input type="text" id="cfg-api-base-url" placeholder="http://localhost:5000" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">KIOSK_NAME (NAMA BOOTH)</label>
+              <input type="text" id="cfg-kiosk-name" placeholder="KIOSK #04" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">HARDWARE_ID (ID MESIN)</label>
+              <input type="text" id="cfg-hardware-id" placeholder="TB-80MM-STATION-A9" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">MODE ACC PEMBAYARAN KIOSK</label>
+              <select id="cfg-payment-mode" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+                <option value="manual_acc">MANUAL ACC OPERATOR (Admin klik tombol ACC)</option>
+                <option value="auto_instant">AUTO INSTANT ACC (Langsung buka kamera)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">AUTO_ACC_TIMEOUT (DETIK)</label>
+              <input type="number" id="cfg-auto-acc-timeout" placeholder="30" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB 3: PRINTER THERMAL ================= -->
+        <div id="cfg-tab-printer" class="cfg-tab-content space-y-4 hidden">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">INTERFACE PRINTER</label>
+              <select id="cfg-printer-interface" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+                <option value="direct_usb">DIRECT USB (Direct ESC/POS Raw)</option>
+                <option value="network_tcp">NETWORK LAN / TCP (IP Socket Port 9100)</option>
+                <option value="system_spooler">WINDOWS DRIVER SPOOLER (System Print)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">PRINTER IP / PORT ADDRESS</label>
+              <input type="text" id="cfg-printer-ip" placeholder="192.168.1.200:9100 atau COM3" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">LEBAR KERTAS (PAPER WIDTH)</label>
+              <select id="cfg-paper-width" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+                <option value="80mm">80MM (576 Dots - Standar Photobooth Strip)</option>
+                <option value="58mm">58MM (384 Dots - Mini Pocket Struk)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 mb-1.5 font-bold">KERAPATAN HEAD THERMAL (DENSITY 1-15)</label>
+              <div class="flex items-center gap-3">
+                <input type="range" id="cfg-printer-density" min="1" max="15" value="8" class="flex-1 accent-cyan-400 cursor-pointer">
+                <span id="cfg-density-val" class="text-white font-bold w-16 text-center bg-white/5 py-1 rounded">LEVEL 8</span>
+              </div>
+            </div>
+
+            <div class="md:col-span-2 flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+              <div>
+                <h4 class="text-sm font-bold text-white">Auto Cutter Kertas</h4>
+                <p class="text-xs text-slate-400">Kirim perintah pemotong kertas (GS V 66 0) setelah foto selesai keluar</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="cfg-auto-cut" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <button type="button" id="btn-test-printer" class="px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold flex items-center gap-2 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">print</span>
+              <span>TEST CETAK THERMAL FEED</span>
+            </button>
+            <span id="test-printer-status" class="text-xs font-mono text-slate-400"></span>
+          </div>
+        </div>
+
+        <!-- ================= TAB 4: RAW .ENV EDITOR ================= -->
+        <div id="cfg-tab-raw" class="cfg-tab-content space-y-3 hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>Direct File Editor: <strong class="text-slate-200">backend/.env</strong></span>
+            </span>
+            <div class="flex items-center gap-2">
+              <button type="button" id="btn-copy-raw-env" class="px-3 py-1 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">content_copy</span>
+                <span>SALIN</span>
+              </button>
+              <button type="button" id="btn-reset-default-env" class="px-3 py-1 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-amber-400 hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">restart_alt</span>
+                <span>DEFAULT TEMPLATE</span>
+              </button>
+            </div>
+          </div>
+
+          <textarea id="raw-env-textarea" rows="14" spellcheck="false" class="w-full p-4 rounded-xl bg-black/60 border border-white/10 font-mono text-xs text-emerald-400 leading-relaxed focus:outline-none focus:border-cyan-400 selection:bg-cyan-900 selection:text-white resize-y shadow-inner"></textarea>
+          <span class="text-[11px] text-slate-500 font-mono">
+            * Variabel di sini langsung sinkron ke backend server dan modul formulir di atas.
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
+        <div class="text-xs font-mono text-slate-400 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="cfg-sync-status">Status: Tersinkronisasi</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button type="button" id="btn-cancel-config" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono font-bold text-slate-300 hover:text-white transition-colors cursor-pointer">
+            BATAL
+          </button>
+          <button type="button" id="btn-save-config" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-mono text-xs font-bold shadow-[0_0_20px_rgba(6,182,212,0.4)] flex items-center gap-2 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">save</span>
+            <span>SIMPAN KONFIGURASI & .ENV</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- JavaScript Modules -->
   <script src="/js/audio.js"></script>

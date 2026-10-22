@@ -29,6 +29,7 @@ class AdminApp {
     this.initFramesSection();
     this.initStylesSection();
     this.initPhotosSection();
+    this.initSystemConfig();
 
     // Initial data load
     await this.fetchConfig();
@@ -1068,6 +1069,456 @@ class AdminApp {
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+  }
+
+  // --- SYSTEM & ENVIRONMENT (.ENV) CONFIGURATION ---
+
+  initSystemConfig() {
+    const btnOpen = document.getElementById('btn-open-config');
+    const btnClose = document.getElementById('btn-close-config');
+    const btnCancel = document.getElementById('btn-cancel-config');
+    const modal = document.getElementById('modal-config');
+
+    if (btnOpen) {
+      btnOpen.addEventListener('click', () => {
+        this.openConfigModal();
+      });
+    }
+
+    if (btnClose) {
+      btnClose.addEventListener('click', () => {
+        this.closeConfigModal();
+      });
+    }
+
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => {
+        this.closeConfigModal();
+      });
+    }
+
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          this.closeConfigModal();
+        }
+      });
+    }
+
+    // Subtabs inside Config Modal
+    const subtabs = document.querySelectorAll('.cfg-subtab');
+    subtabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetId = tab.getAttribute('data-cfg-tab');
+
+        subtabs.forEach(t => {
+          t.classList.remove('border-cyan-400', 'text-cyan-400');
+          t.classList.add('border-transparent', 'text-slate-400');
+        });
+        tab.classList.add('border-cyan-400', 'text-cyan-400');
+        tab.classList.remove('border-transparent', 'text-slate-400');
+
+        document.querySelectorAll('.cfg-tab-content').forEach(content => {
+          if (content.id === targetId) {
+            content.classList.remove('hidden');
+          } else {
+            content.classList.add('hidden');
+          }
+        });
+
+        if (targetId === 'cfg-tab-raw') {
+          this.syncFormToRawEnv();
+        }
+      });
+    });
+
+    // Printer density slider label
+    const densitySlider = document.getElementById('cfg-printer-density');
+    const densityVal = document.getElementById('cfg-density-val');
+    if (densitySlider && densityVal) {
+      densitySlider.addEventListener('input', (e) => {
+        densityVal.textContent = `LEVEL ${e.target.value}`;
+      });
+    }
+
+    // Toggle Secret Key Visibility
+    const toggleSecretBtn = document.getElementById('btn-toggle-secret-key');
+    const secretInput = document.getElementById('cfg-r2-secret-key');
+    if (toggleSecretBtn && secretInput) {
+      toggleSecretBtn.addEventListener('click', () => {
+        const isPassword = secretInput.type === 'password';
+        secretInput.type = isPassword ? 'text' : 'password';
+        const icon = toggleSecretBtn.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = isPassword ? 'visibility_off' : 'visibility';
+      });
+    }
+
+    // Test R2
+    const btnTestR2 = document.getElementById('btn-test-r2');
+    if (btnTestR2) {
+      btnTestR2.addEventListener('click', () => {
+        this.testR2Connection();
+      });
+    }
+
+    // Test Printer
+    const btnTestPrinter = document.getElementById('btn-test-printer');
+    if (btnTestPrinter) {
+      btnTestPrinter.addEventListener('click', () => {
+        this.testPrinterFeed();
+      });
+    }
+
+    // Copy Raw .env
+    const btnCopyEnv = document.getElementById('btn-copy-raw-env');
+    if (btnCopyEnv) {
+      btnCopyEnv.addEventListener('click', () => {
+        const textarea = document.getElementById('raw-env-textarea');
+        if (textarea) {
+          navigator.clipboard.writeText(textarea.value);
+          this.showToast('Isi file .env berhasil disalin ke clipboard');
+        }
+      });
+    }
+
+    // Reset Default Template
+    const btnResetEnv = document.getElementById('btn-reset-default-env');
+    if (btnResetEnv) {
+      btnResetEnv.addEventListener('click', () => {
+        if (confirm('Muat template default .env? Perubahan yang belum disimpan akan tertimpa.')) {
+          if (this.defaultEnvContent) {
+            const textarea = document.getElementById('raw-env-textarea');
+            if (textarea) {
+              textarea.value = this.defaultEnvContent;
+              this.syncRawEnvToForm(this.defaultEnvContent);
+              this.showToast('Template default .env dimuat');
+            }
+          }
+        }
+      });
+    }
+
+    // Save Config
+    const btnSave = document.getElementById('btn-save-config');
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
+        this.saveEnvConfig();
+      });
+    }
+  }
+
+  async openConfigModal() {
+    const modal = document.getElementById('modal-config');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    await this.loadEnvConfig();
+  }
+
+  closeConfigModal() {
+    const modal = document.getElementById('modal-config');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  async loadEnvConfig() {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/env`);
+      const data = await res.json();
+      if (data.success) {
+        this.rawEnvContent = data.rawEnv || '';
+        this.defaultEnvContent = data.defaultEnv || '';
+        this.envObj = data.env || {};
+
+        const textarea = document.getElementById('raw-env-textarea');
+        if (textarea) textarea.value = this.rawEnvContent;
+
+        this.populateConfigForm(this.envObj);
+      }
+    } catch (err) {
+      console.error('Error loading env config:', err);
+      this.showToast('Gagal memuat file .env dari server', true);
+    }
+  }
+
+  populateConfigForm(env) {
+    const r2Enabled = document.getElementById('cfg-r2-enabled');
+    const r2AccountId = document.getElementById('cfg-r2-account-id');
+    const r2BucketName = document.getElementById('cfg-r2-bucket-name');
+    const r2AccessKey = document.getElementById('cfg-r2-access-key');
+    const r2SecretKey = document.getElementById('cfg-r2-secret-key');
+    const r2PublicDomain = document.getElementById('cfg-r2-public-domain');
+
+    if (r2Enabled) r2Enabled.checked = env.R2_ENABLED === 'true' || env.R2_ENABLED === true;
+    if (r2AccountId) r2AccountId.value = env.R2_ACCOUNT_ID || '';
+    if (r2BucketName) r2BucketName.value = env.R2_BUCKET_NAME || 'photobooth-prints';
+    if (r2AccessKey) r2AccessKey.value = env.R2_ACCESS_KEY_ID || '';
+    if (r2SecretKey) r2SecretKey.value = env.R2_SECRET_ACCESS_KEY || '';
+    if (r2PublicDomain) r2PublicDomain.value = env.R2_PUBLIC_DOMAIN || '';
+
+    const srvPort = document.getElementById('cfg-server-port');
+    const apiBase = document.getElementById('cfg-api-base-url');
+    const kioskName = document.getElementById('cfg-kiosk-name');
+    const hardwareId = document.getElementById('cfg-hardware-id');
+    const paymentMode = document.getElementById('cfg-payment-mode');
+    const autoTimeout = document.getElementById('cfg-auto-acc-timeout');
+
+    if (srvPort) srvPort.value = env.PORT || 5000;
+    if (apiBase) apiBase.value = env.API_BASE_URL || 'http://localhost:5000';
+    if (kioskName) kioskName.value = env.KIOSK_NAME || this.settings.kioskName || 'KIOSK #04';
+    if (hardwareId) hardwareId.value = env.HARDWARE_ID || this.settings.hardwareId || 'TB-80MM-STATION-A9';
+    if (paymentMode) paymentMode.value = env.PAYMENT_MODE || this.settings.paymentMode || 'manual_acc';
+    if (autoTimeout) autoTimeout.value = env.AUTO_ACC_TIMEOUT || this.settings.autoAccTimeout || 30;
+
+    const prnInterface = document.getElementById('cfg-printer-interface');
+    const prnIp = document.getElementById('cfg-printer-ip');
+    const prnWidth = document.getElementById('cfg-paper-width');
+    const prnDensity = document.getElementById('cfg-printer-density');
+    const prnDensityVal = document.getElementById('cfg-density-val');
+    const prnAutoCut = document.getElementById('cfg-auto-cut');
+
+    if (prnInterface) prnInterface.value = env.PRINTER_INTERFACE || 'direct_usb';
+    if (prnIp) prnIp.value = env.PRINTER_IP || '192.168.1.200:9100';
+    if (prnWidth) prnWidth.value = env.PAPER_WIDTH || '80mm';
+    if (prnDensity) {
+      prnDensity.value = env.PRINT_DENSITY || 8;
+      if (prnDensityVal) prnDensityVal.textContent = `LEVEL ${prnDensity.value}`;
+    }
+    if (prnAutoCut) prnAutoCut.checked = env.AUTO_CUT !== 'false';
+  }
+
+  collectConfigForm() {
+    const env = { ...this.envObj };
+
+    const r2Enabled = document.getElementById('cfg-r2-enabled');
+    const r2AccountId = document.getElementById('cfg-r2-account-id');
+    const r2BucketName = document.getElementById('cfg-r2-bucket-name');
+    const r2AccessKey = document.getElementById('cfg-r2-access-key');
+    const r2SecretKey = document.getElementById('cfg-r2-secret-key');
+    const r2PublicDomain = document.getElementById('cfg-r2-public-domain');
+
+    if (r2Enabled) env.R2_ENABLED = r2Enabled.checked ? 'true' : 'false';
+    if (r2AccountId) env.R2_ACCOUNT_ID = r2AccountId.value.trim();
+    if (r2BucketName) env.R2_BUCKET_NAME = r2BucketName.value.trim();
+    if (r2AccessKey) env.R2_ACCESS_KEY_ID = r2AccessKey.value.trim();
+    if (r2SecretKey) env.R2_SECRET_ACCESS_KEY = r2SecretKey.value.trim();
+    if (r2PublicDomain) env.R2_PUBLIC_DOMAIN = r2PublicDomain.value.trim();
+
+    const srvPort = document.getElementById('cfg-server-port');
+    const apiBase = document.getElementById('cfg-api-base-url');
+    const kioskName = document.getElementById('cfg-kiosk-name');
+    const hardwareId = document.getElementById('cfg-hardware-id');
+    const paymentMode = document.getElementById('cfg-payment-mode');
+    const autoTimeout = document.getElementById('cfg-auto-acc-timeout');
+
+    if (srvPort) env.PORT = srvPort.value.trim() || '5000';
+    if (apiBase) env.API_BASE_URL = apiBase.value.trim() || 'http://localhost:5000';
+    if (kioskName) env.KIOSK_NAME = kioskName.value.trim() || 'KIOSK #04';
+    if (hardwareId) env.HARDWARE_ID = hardwareId.value.trim() || 'TB-80MM-STATION-A9';
+    if (paymentMode) env.PAYMENT_MODE = paymentMode.value;
+    if (autoTimeout) env.AUTO_ACC_TIMEOUT = autoTimeout.value.trim() || '30';
+
+    const prnInterface = document.getElementById('cfg-printer-interface');
+    const prnIp = document.getElementById('cfg-printer-ip');
+    const prnWidth = document.getElementById('cfg-paper-width');
+    const prnDensity = document.getElementById('cfg-printer-density');
+    const prnAutoCut = document.getElementById('cfg-auto-cut');
+
+    if (prnInterface) env.PRINTER_INTERFACE = prnInterface.value;
+    if (prnIp) env.PRINTER_IP = prnIp.value.trim();
+    if (prnWidth) env.PAPER_WIDTH = prnWidth.value;
+    if (prnDensity) env.PRINT_DENSITY = prnDensity.value;
+    if (prnAutoCut) env.AUTO_CUT = prnAutoCut.checked ? 'true' : 'false';
+
+    return env;
+  }
+
+  syncFormToRawEnv() {
+    const env = this.collectConfigForm();
+    const textarea = document.getElementById('raw-env-textarea');
+    if (!textarea) return;
+
+    let text = textarea.value;
+    const lines = text.split(/\r?\n/);
+    const updated = [];
+    const touched = new Set();
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) {
+        updated.push(line);
+        continue;
+      }
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx !== -1) {
+        const key = trimmed.slice(0, eqIdx).trim();
+        if (key in env) {
+          let val = env[key];
+          if (typeof val === 'string' && (val.includes(' ') || val.includes('#'))) {
+            val = `"${val}"`;
+          }
+          updated.push(`${key}=${val}`);
+          touched.add(key);
+        } else {
+          updated.push(line);
+        }
+      } else {
+        updated.push(line);
+      }
+    }
+
+    for (const [k, v] of Object.entries(env)) {
+      if (!touched.has(k)) {
+        let val = v;
+        if (typeof val === 'string' && (val.includes(' ') || val.includes('#'))) {
+          val = `"${val}"`;
+        }
+        updated.push(`${k}=${val}`);
+      }
+    }
+
+    textarea.value = updated.join('\n');
+  }
+
+  syncRawEnvToForm(rawText) {
+    const env = {};
+    const lines = rawText.split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx !== -1) {
+        const key = trimmed.slice(0, eqIdx).trim();
+        let val = trimmed.slice(eqIdx + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        env[key] = val;
+      }
+    }
+    this.populateConfigForm(env);
+  }
+
+  async saveEnvConfig() {
+    try {
+      const saveBtn = document.getElementById('btn-save-config');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.classList.add('opacity-50');
+      }
+
+      const activeTab = document.querySelector('.cfg-subtab.active');
+      const isRawTab = activeTab && activeTab.getAttribute('data-cfg-tab') === 'cfg-tab-raw';
+
+      let payload = {};
+      if (isRawTab) {
+        const textarea = document.getElementById('raw-env-textarea');
+        payload.rawEnv = textarea ? textarea.value : '';
+      } else {
+        payload.env = this.collectConfigForm();
+      }
+
+      const res = await fetch(`${API_BASE}/api/admin/env`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        this.showToast('Konfigurasi .env berhasil disimpan & disinkronkan!');
+        if (data.rawEnv) {
+          const textarea = document.getElementById('raw-env-textarea');
+          if (textarea) textarea.value = data.rawEnv;
+        }
+        if (data.env) {
+          this.populateConfigForm(data.env);
+        }
+        await this.fetchConfig();
+        this.closeConfigModal();
+      } else {
+        this.showToast(data.error || 'Gagal menyimpan konfigurasi', true);
+      }
+    } catch (err) {
+      console.error('Error saving config:', err);
+      this.showToast('Gagal menghubungi server', true);
+    } finally {
+      const saveBtn = document.getElementById('btn-save-config');
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('opacity-50');
+      }
+    }
+  }
+
+  async testR2Connection() {
+    const statusEl = document.getElementById('test-r2-status');
+    const env = this.collectConfigForm();
+    if (statusEl) {
+      statusEl.textContent = 'Memeriksa kredensial R2...';
+      statusEl.className = 'text-xs font-mono text-cyan-400 animate-pulse';
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/env/test-r2`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accountId: env.R2_ACCOUNT_ID,
+          accessKey: env.R2_ACCESS_KEY_ID,
+          secretKey: env.R2_SECRET_ACCESS_KEY,
+          bucketName: env.R2_BUCKET_NAME,
+          publicDomain: env.R2_PUBLIC_DOMAIN
+        })
+      });
+      const data = await res.json();
+      if (statusEl) {
+        statusEl.textContent = data.message;
+        statusEl.className = `text-xs font-mono ${data.success ? 'text-emerald-400' : 'text-red-400'}`;
+      }
+      this.showToast(data.message, !data.success);
+    } catch (err) {
+      if (statusEl) {
+        statusEl.textContent = 'Gagal menghubungi server untuk test R2';
+        statusEl.className = 'text-xs font-mono text-red-400';
+      }
+    }
+  }
+
+  async testPrinterFeed() {
+    const statusEl = document.getElementById('test-printer-status');
+    const env = this.collectConfigForm();
+    if (statusEl) {
+      statusEl.textContent = 'Mengirim perintah feed test...';
+      statusEl.className = 'text-xs font-mono text-emerald-400 animate-pulse';
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/env/test-printer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          printerType: env.PRINTER_INTERFACE,
+          printerIp: env.PRINTER_IP,
+          paperWidth: env.PAPER_WIDTH,
+          density: env.PRINT_DENSITY,
+          autoCut: env.AUTO_CUT
+        })
+      });
+      const data = await res.json();
+      if (statusEl) {
+        statusEl.textContent = data.message;
+        statusEl.className = `text-xs font-mono ${data.success ? 'text-emerald-400' : 'text-red-400'}`;
+      }
+      if (window.kioskAudio) window.kioskAudio.playShutter();
+      this.showToast(data.message, !data.success);
+    } catch (err) {
+      if (statusEl) {
+        statusEl.textContent = 'Gagal mengirim perintah test printer';
+        statusEl.className = 'text-xs font-mono text-red-400';
+      }
+    }
   }
 }
 
