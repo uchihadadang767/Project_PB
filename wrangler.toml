@@ -1,0 +1,12 @@
+name = "project-pb"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+# Cloudflare R2 Bucket Binding
+# Hubungkan nama bucket R2 kamu di Cloudflare ke binding PHOTO_BUCKET
+[[r2_buckets]]
+binding = "PHOTO_BUCKET"
+bucket_name = "photobooth-prints"
+
+[observability]
+enabled = true

@@ -46,8 +46,9 @@ HARDWARE_ID="TB-80MM-STATION-A9"
 PAYMENT_MODE=manual_acc
 AUTO_ACC_TIMEOUT=30
 
-# Cloudflare R2 Object Storage (S3-Compatible)
+# Cloudflare R2 Object Storage & Worker Gateway
 R2_ENABLED=false
+R2_WORKER_URL=
 R2_ACCOUNT_ID=
 R2_ACCESS_KEY_ID=
 R2_SECRET_ACCESS_KEY=
@@ -61,6 +62,38 @@ PAPER_WIDTH=80mm
 PRINT_DENSITY=8
 AUTO_CUT=true
 `;
+
+async function uploadToR2(filename, buffer, metadata = {}) {
+  const isEnabled = process.env.R2_ENABLED === 'true' || process.env.R2_ENABLED === true;
+  if (!isEnabled) return null;
+
+  const workerUrl = process.env.R2_WORKER_URL || process.env.R2_PUBLIC_DOMAIN;
+  if (workerUrl) {
+    try {
+      const uploadEndpoint = workerUrl.replace(/\/$/, '') + '/upload';
+      console.log(`[R2-SYNC] Uploading ${filename} to Cloudflare Worker R2: ${uploadEndpoint}`);
+      const response = await fetch(uploadEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename,
+          imageBase64: buffer.toString('base64'),
+          metadata
+        })
+      });
+      const data = await response.json();
+      if (data.success && data.url) {
+        console.log(`[R2-SYNC] Upload success: ${data.url}`);
+        return data.url;
+      } else {
+        console.warn('[R2-SYNC] Worker response:', data);
+      }
+    } catch (err) {
+      console.warn('[R2-SYNC] Error connecting to Cloudflare Worker R2 gateway:', err.message);
+    }
+  }
+  return null;
+}
 
 function getRawEnv() {
   if (fs.existsSync(ENV_PATH)) {
@@ -248,30 +281,42 @@ app.post('/api/session/pay', (req, res) => {
   });
 });
 
-// 5. Save and Queue Print Job
-app.post('/api/print', (req, res) => {
+// 5. Save and Queue Print Job (With Local Storage + Cloudflare R2 Sync)
+app.post('/api/print', async (req, res) => {
   try {
     const { sessionId, stripImageBase64, metadata } = req.body;
     const printId = 'PRINT-' + Date.now();
     
     let filePath = null;
     let fileUrl = null;
+    let r2Url = null;
+    let buffer = null;
+    const filename = `${printId}.png`;
 
     if (stripImageBase64) {
       const base64Data = stripImageBase64.replace(/^data:image\/\w+;base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
-      const filename = `${printId}.png`;
+      buffer = Buffer.from(base64Data, 'base64');
       filePath = path.join(PRINTS_DIR, filename);
       fs.writeFileSync(filePath, buffer);
       fileUrl = `/prints/${filename}`;
+
+      // Upload to Cloudflare R2 asynchronously
+      r2Url = await uploadToR2(filename, buffer, {
+        sessionId: sessionId || 'SESS-04',
+        printId
+      });
     }
+
+    const finalUrl = r2Url || fileUrl;
 
     // Save job metadata JSON
     const metaPath = path.join(PRINTS_DIR, `${printId}.json`);
     const printMeta = {
       printId,
       sessionId: sessionId || 'SESS-04',
-      fileUrl,
+      fileUrl: finalUrl,
+      localFileUrl: fileUrl,
+      r2Url: r2Url || null,
       metadata: metadata || {},
       createdAt: new Date().toISOString()
     };
@@ -283,14 +328,15 @@ app.post('/api/print', (req, res) => {
     if (orderIndex !== -1) {
       orders[orderIndex].status = 'COMPLETED';
       orders[orderIndex].printId = printId;
-      orders[orderIndex].fileUrl = fileUrl;
+      orders[orderIndex].fileUrl = finalUrl;
       writeJson('orders.json', orders);
     }
 
     res.json({
       success: true,
       printId,
-      fileUrl,
+      fileUrl: finalUrl,
+      r2Url,
       message: 'Print dispatched to direct thermal feed apparatus',
       estimatedDispenseSecs: 3
     });
@@ -598,12 +644,32 @@ app.post('/api/admin/env', (req, res) => {
 });
 
 // 3. Test R2 Connection Parameters
-app.post('/api/admin/env/test-r2', (req, res) => {
-  const { accountId, accessKey, secretKey, bucketName, publicDomain } = req.body;
+app.post('/api/admin/env/test-r2', async (req, res) => {
+  const { accountId, accessKey, secretKey, bucketName, publicDomain, workerUrl } = req.body;
+  const targetWorker = workerUrl || publicDomain;
+
+  if (targetWorker && targetWorker.includes('workers.dev')) {
+    try {
+      const cleanUrl = targetWorker.replace(/\/$/, '');
+      const testRes = await fetch(`${cleanUrl}/api/status`);
+      const statusData = await testRes.json();
+      return res.json({
+        success: true,
+        message: `Koneksi Cloudflare Worker Berhasil! Status: ${statusData.status} (R2 Bucket Bound: ${statusData.r2BucketBound})`,
+        data: statusData
+      });
+    } catch (err) {
+      return res.json({
+        success: false,
+        message: `Gagal memanggil Cloudflare Worker di ${targetWorker}: ${err.message}`
+      });
+    }
+  }
+
   if (!accountId || !accessKey || !secretKey || !bucketName) {
     return res.json({
       success: false,
-      message: 'Harap lengkapi R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, dan R2_BUCKET_NAME'
+      message: 'Harap lengkapi R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, dan R2_BUCKET_NAME (atau R2_WORKER_URL)'
     });
   }
 

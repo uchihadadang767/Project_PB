@@ -810,9 +810,15 @@
             </div>
 
             <div class="md:col-span-2">
-              <label class="block text-slate-300 mb-1.5 font-bold">R2_PUBLIC_DOMAIN / CUSTOM DOMAIN (URL PUBLIK)</label>
-              <input type="text" id="cfg-r2-public-domain" placeholder="https://pub-xxxxxx.r2.dev atau https://cdn.photobooth.com" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
-              <span class="text-[10px] text-slate-500">Domain publik R2 atau custom domain yang aktif untuk membuka gambar di struk</span>
+              <label class="block text-slate-300 mb-1.5 font-bold">R2_WORKER_URL (CLOUDFLARE WORKER GATEWAY)</label>
+              <input type="text" id="cfg-r2-worker-url" placeholder="https://project-pb.denispratama2008.workers.dev" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <span class="text-[10px] text-slate-500">URL Cloudflare Worker project-pb hasil deploy dari dashboard Cloudflare</span>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-slate-300 mb-1.5 font-bold">R2_PUBLIC_DOMAIN / CUSTOM DOMAIN (URL PUBLIK STRUK)</label>
+              <input type="text" id="cfg-r2-public-domain" placeholder="https://pub-xxxxxx.r2.dev atau https://project-pb.denispratama2008.workers.dev" class="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/10 text-slate-100 focus:outline-none focus:border-cyan-400 transition-colors">
+              <span class="text-[10px] text-slate-500">Domain publik R2 atau URL worker yang dicetak di QR struk untuk download pengunjung</span>
             </div>
           </div>
 

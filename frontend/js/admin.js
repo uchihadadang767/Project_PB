@@ -1248,6 +1248,7 @@ class AdminApp {
     const r2BucketName = document.getElementById('cfg-r2-bucket-name');
     const r2AccessKey = document.getElementById('cfg-r2-access-key');
     const r2SecretKey = document.getElementById('cfg-r2-secret-key');
+    const r2WorkerUrl = document.getElementById('cfg-r2-worker-url');
     const r2PublicDomain = document.getElementById('cfg-r2-public-domain');
 
     if (r2Enabled) r2Enabled.checked = env.R2_ENABLED === 'true' || env.R2_ENABLED === true;
@@ -1255,6 +1256,7 @@ class AdminApp {
     if (r2BucketName) r2BucketName.value = env.R2_BUCKET_NAME || 'photobooth-prints';
     if (r2AccessKey) r2AccessKey.value = env.R2_ACCESS_KEY_ID || '';
     if (r2SecretKey) r2SecretKey.value = env.R2_SECRET_ACCESS_KEY || '';
+    if (r2WorkerUrl) r2WorkerUrl.value = env.R2_WORKER_URL || '';
     if (r2PublicDomain) r2PublicDomain.value = env.R2_PUBLIC_DOMAIN || '';
 
     const srvPort = document.getElementById('cfg-server-port');
@@ -1296,6 +1298,7 @@ class AdminApp {
     const r2BucketName = document.getElementById('cfg-r2-bucket-name');
     const r2AccessKey = document.getElementById('cfg-r2-access-key');
     const r2SecretKey = document.getElementById('cfg-r2-secret-key');
+    const r2WorkerUrl = document.getElementById('cfg-r2-worker-url');
     const r2PublicDomain = document.getElementById('cfg-r2-public-domain');
 
     if (r2Enabled) env.R2_ENABLED = r2Enabled.checked ? 'true' : 'false';
@@ -1303,6 +1306,7 @@ class AdminApp {
     if (r2BucketName) env.R2_BUCKET_NAME = r2BucketName.value.trim();
     if (r2AccessKey) env.R2_ACCESS_KEY_ID = r2AccessKey.value.trim();
     if (r2SecretKey) env.R2_SECRET_ACCESS_KEY = r2SecretKey.value.trim();
+    if (r2WorkerUrl) env.R2_WORKER_URL = r2WorkerUrl.value.trim();
     if (r2PublicDomain) env.R2_PUBLIC_DOMAIN = r2PublicDomain.value.trim();
 
     const srvPort = document.getElementById('cfg-server-port');
@@ -1469,7 +1473,8 @@ class AdminApp {
           accessKey: env.R2_ACCESS_KEY_ID,
           secretKey: env.R2_SECRET_ACCESS_KEY,
           bucketName: env.R2_BUCKET_NAME,
-          publicDomain: env.R2_PUBLIC_DOMAIN
+          publicDomain: env.R2_PUBLIC_DOMAIN,
+          workerUrl: env.R2_WORKER_URL
         })
       });
       const data = await res.json();
