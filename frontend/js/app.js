@@ -18,14 +18,16 @@ function resolveApiBase() {
 
 const API_BASE = resolveApiBase();
 
-// Auto inject bypass-tunnel-reminder header for localtunnel bridge
+// Auto inject bypass-tunnel-reminder header only when using localtunnel
 const _origFetch = window.fetch;
 window.fetch = function(url, options = {}) {
   options = options || {};
-  options.headers = {
-    'bypass-tunnel-reminder': 'true',
-    ...(options.headers || {})
-  };
+  if (typeof url === 'string' && url.includes('loca.lt')) {
+    options.headers = {
+      'bypass-tunnel-reminder': 'true',
+      ...(options.headers || {})
+    };
+  }
   return _origFetch.call(this, url, options);
 };
 
