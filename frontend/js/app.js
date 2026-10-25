@@ -6,7 +6,7 @@
 // Backend API Base URL
 // Local dev (port 3000) -> connects to backend (http://localhost:5000).
 // Production / Vercel -> connects to local thermal printer bridge via HTTPS tunnel.
-const DEFAULT_BRIDGE_URL = 'https://photobooth-kiosk-local.loca.lt';
+const DEFAULT_BRIDGE_URL = 'https://costume-bicycle-carnival-submitted.trycloudflare.com';
 
 function resolveApiBase() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {

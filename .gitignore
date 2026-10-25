@@ -6,4 +6,5 @@ prints/
 dist/
 .env
 *.log
+*.exe
 .DS_Store
