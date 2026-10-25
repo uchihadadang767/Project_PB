@@ -114,6 +114,7 @@ async function printImageSilent(imagePath, options = {}) {
   }
 
   const printerName = options.printerName || 'RPP02N (Bluetooth COM6)';
+  const cleanPrinterName = printerName.replace(/[()]/g, '').trim() || 'RPP02N COM6';
 
   // Check hardware connection if targeting Thermal / Bluetooth Printer
   const hw = await checkPrinterHardwareStatus();
@@ -138,7 +139,7 @@ async function printImageSilent(imagePath, options = {}) {
       '-ImagePath',
       imagePath,
       '-PrinterName',
-      printerName
+      cleanPrinterName
     ];
 
     if (options.paperWidth) {
@@ -179,6 +180,7 @@ async function printImageSilent(imagePath, options = {}) {
  */
 async function printTestReceipt(options = {}) {
   const printerName = options.printerName || 'RPP02N (Bluetooth COM6)';
+  const cleanPrinterName = printerName.replace(/[()]/g, '').trim() || 'RPP02N COM6';
 
   // Check hardware connection if targeting thermal / bluetooth printer
   const hw = await checkPrinterHardwareStatus();
@@ -201,7 +203,7 @@ async function printTestReceipt(options = {}) {
       '-File',
       PS_HELPER_PATH,
       '-PrinterName',
-      printerName,
+      cleanPrinterName,
       '-TestFeed'
     ];
 

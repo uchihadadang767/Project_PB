@@ -9,8 +9,16 @@ function resolveApiBase() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return window.location.port === '5000' ? '' : (window.location.port === '3000' ? '' : 'http://localhost:5000');
   }
-  const custom = localStorage.getItem('kiosk_api_base_url');
-  return custom ? custom.trim().replace(/\/+$/, '') : DEFAULT_BRIDGE_URL;
+
+  try {
+    const custom = localStorage.getItem('kiosk_api_base_url');
+    if (custom && custom.startsWith('https://') && !custom.includes('lhr.life') && !custom.includes('loca.lt') && !custom.includes('pinggy') && !custom.includes('localhost')) {
+      return custom.trim().replace(/\/+$/, '');
+    }
+    localStorage.removeItem('kiosk_api_base_url');
+  } catch (e) {}
+
+  return DEFAULT_BRIDGE_URL;
 }
 
 const API_BASE = resolveApiBase();
@@ -1522,8 +1530,10 @@ class AdminApp {
       const data = await res.json();
 
       if (data.success) {
-        if (payload.env && payload.env.API_BASE_URL) {
+        if (payload.env && payload.env.API_BASE_URL && payload.env.API_BASE_URL.startsWith('https://')) {
           localStorage.setItem('kiosk_api_base_url', payload.env.API_BASE_URL);
+        } else {
+          localStorage.removeItem('kiosk_api_base_url');
         }
         this.showToast('Konfigurasi .env berhasil disimpan & disinkronkan!');
         if (data.rawEnv) {

@@ -33,8 +33,18 @@ public class RawComPrinter {
         uint share = 0;
         uint openExisting = 3;
 
-        SafeFileHandle handle = CreateFile(fullPort, access, share, IntPtr.Zero, openExisting, 0, IntPtr.Zero);
-        if (handle.IsInvalid) {
+        SafeFileHandle handle = null;
+        for (int i = 0; i < 6; i++) {
+            handle = CreateFile(fullPort, access, share, IntPtr.Zero, openExisting, 0, IntPtr.Zero);
+            if (!handle.IsInvalid) {
+                break;
+            }
+            System.Threading.Thread.Sleep(350);
+        }
+
+        if (handle == null || handle.IsInvalid) {
+            int err = Marshal.GetLastWin32Error();
+            Console.WriteLine("[RawComPrinter] CreateFile failed for " + fullPort + " with Win32 error: " + err);
             return false;
         }
 

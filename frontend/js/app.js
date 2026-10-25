@@ -12,8 +12,16 @@ function resolveApiBase() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return window.location.port === '5000' ? '' : 'http://localhost:5000';
   }
-  const custom = localStorage.getItem('kiosk_api_base_url');
-  return custom ? custom.trim().replace(/\/+$/, '') : DEFAULT_BRIDGE_URL;
+
+  try {
+    const custom = localStorage.getItem('kiosk_api_base_url');
+    if (custom && custom.startsWith('https://') && !custom.includes('lhr.life') && !custom.includes('loca.lt') && !custom.includes('pinggy') && !custom.includes('localhost')) {
+      return custom.trim().replace(/\/+$/, '');
+    }
+    localStorage.removeItem('kiosk_api_base_url');
+  } catch (e) {}
+
+  return DEFAULT_BRIDGE_URL;
 }
 
 const API_BASE = resolveApiBase();
