@@ -11,8 +11,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'bypass-tunnel-reminder', 'x-requested-with', '*']
 }));
+app.options('*', cors());
 
 // Generous JSON body parser limit for base64 photo payloads and QR images
 app.use(express.json({ limit: '50mb' }));
