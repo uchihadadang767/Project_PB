@@ -263,7 +263,17 @@ try {
         $autoCut = $false
     }
 
-    Write-Host "[PRINT-HELPER] Target Printer: $targetPrinter (Bluetooth: $isBluetooth, Port: $comPort, Width: $targetDots dots)"
+    # Resolve spooler printer name
+    $spoolerName = $targetPrinter
+    if ($installed -contains $targetPrinter) {
+        $spoolerName = $targetPrinter
+    } elseif ($installed -contains "Thermal Printer") {
+        $spoolerName = "Thermal Printer"
+    } else {
+        $spoolerName = (New-Object System.Drawing.Printing.PrinterSettings).PrinterName
+    }
+
+    Write-Host "[PRINT-HELPER] Target Printer: $targetPrinter (Bluetooth: $isBluetooth, Port: $comPort, Width: $targetDots dots, Spooler: $spoolerName)"
 
     # If TestFeed requested, send test ticket
     if ($TestFeed) {
@@ -275,9 +285,9 @@ try {
                 exit 0
             }
         }
-        $rawSuccess = [RawThermalPrinter]::SendRawBytes($targetPrinter, $testBytes)
+        $rawSuccess = [RawThermalPrinter]::SendRawBytes($spoolerName, $testBytes)
         if ($rawSuccess) {
-            Write-Output "SUCCESS_TEST: Test ticket printed to $targetPrinter"
+            Write-Output "SUCCESS_TEST: Test ticket printed to $spoolerName"
             exit 0
         } else {
             Write-Error "RAW_PRINT_FAILED: Failed to send test ticket to $targetPrinter"
@@ -303,9 +313,9 @@ try {
             }
         }
 
-        $rawSuccess = [RawThermalPrinter]::SendRawBytes($targetPrinter, $escposBytes)
+        $rawSuccess = [RawThermalPrinter]::SendRawBytes($spoolerName, $escposBytes)
         if ($rawSuccess) {
-            Write-Output "SUCCESS_RAW: Printed ESC/POS bitmap to $targetPrinter"
+            Write-Output "SUCCESS_RAW: Printed ESC/POS bitmap to $spoolerName"
             exit 0
         }
     } catch {
@@ -314,7 +324,7 @@ try {
 
     # Step 2: Fallback to GDI PrintDocument
     $doc = New-Object System.Drawing.Printing.PrintDocument
-    $doc.PrinterSettings.PrinterName = $targetPrinter
+    $doc.PrinterSettings.PrinterName = $spoolerName
     $doc.DefaultPageSettings.Margins = New-Object System.Drawing.Printing.Margins(0, 0, 0, 0)
     $doc.OriginAtMargins = $true
 
