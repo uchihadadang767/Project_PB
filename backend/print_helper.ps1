@@ -27,6 +27,18 @@ public class RawComPrinter {
         IntPtr hTemplateFile
     );
 
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool WriteFile(
+        SafeFileHandle hFile,
+        byte[] lpBuffer,
+        uint nNumberOfBytesToWrite,
+        out uint lpNumberOfBytesWritten,
+        IntPtr lpOverlapped
+    );
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool FlushFileBuffers(SafeFileHandle hFile);
+
     public static bool SendRawBytes(string portName, byte[] bytes) {
         string fullPort = @"\\.\" + portName.TrimEnd(':');
         uint access = 0x40000000; // GENERIC_WRITE
@@ -49,12 +61,18 @@ public class RawComPrinter {
         }
 
         try {
-            using (FileStream fs = new FileStream(handle, FileAccess.Write)) {
-                fs.Write(bytes, 0, bytes.Length);
-                fs.Flush();
+            uint written = 0;
+            bool ok = WriteFile(handle, bytes, (uint)bytes.Length, out written, IntPtr.Zero);
+            if (!ok || written == 0) {
+                int err = Marshal.GetLastWin32Error();
+                Console.WriteLine("[RawComPrinter] WriteFile failed. Written: " + written + ", Error: " + err);
+                return false;
             }
+            FlushFileBuffers(handle);
+            System.Threading.Thread.Sleep(500);
             return true;
-        } catch {
+        } catch (Exception ex) {
+            Console.WriteLine("[RawComPrinter] Exception: " + ex.Message);
             return false;
         } finally {
             handle.Close();
@@ -271,6 +289,15 @@ try {
         $spoolerName = "Thermal Printer"
     } else {
         $spoolerName = (New-Object System.Drawing.Printing.PrinterSettings).PrinterName
+    }
+
+    if ($isBluetooth -and ($installed -contains "Thermal Printer")) {
+        try {
+            $curP = Get-Printer -Name "Thermal Printer" -ErrorAction SilentlyContinue
+            if ($curP -and $curP.PortName -ne "$comPort`:") {
+                Set-Printer -Name "Thermal Printer" -PortName "$comPort`:" -ErrorAction SilentlyContinue
+            }
+        } catch {}
     }
 
     Write-Host "[PRINT-HELPER] Target Printer: $targetPrinter (Bluetooth: $isBluetooth, Port: $comPort, Width: $targetDots dots, Spooler: $spoolerName)"
