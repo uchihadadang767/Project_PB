@@ -3,7 +3,7 @@
  * Manages Clean 5-Button Home Dashboard, Dedicated Sub-Pages, Orders ACC, QR Payment, Frame Geometry, Photo Styles, and Archives
  */
 
-const DEFAULT_BRIDGE_URL = 'https://f4c6400aa43f92.lhr.life';
+const DEFAULT_BRIDGE_URL = 'https://frankfurt-commerce-project-charles.trycloudflare.com';
 
 function resolveApiBase() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -1190,6 +1190,31 @@ class AdminApp {
       });
     }
 
+    // Auto-adjust settings for Bluetooth printer
+    const prnSelect = document.getElementById('cfg-printer-name');
+    const prnIfaceSelect = document.getElementById('cfg-printer-interface');
+    const prnWidthSelect = document.getElementById('cfg-paper-width');
+    const prnAutoCutBox = document.getElementById('cfg-auto-cut');
+    const prnIpInput = document.getElementById('cfg-printer-ip');
+
+    const handlePrinterChange = () => {
+      const name = prnSelect ? prnSelect.value : '';
+      const iface = prnIfaceSelect ? prnIfaceSelect.value : '';
+      if (iface === 'bluetooth_com' || name.includes('RPP') || name.includes('COM') || name.includes('Bluetooth')) {
+        if (prnWidthSelect) prnWidthSelect.value = '58mm';
+        if (prnAutoCutBox) prnAutoCutBox.checked = false;
+        if (prnIpInput && (!prnIpInput.value || prnIpInput.value.includes('192.168'))) {
+          prnIpInput.value = 'COM6';
+        }
+        if (prnIfaceSelect && iface !== 'bluetooth_com') {
+          prnIfaceSelect.value = 'bluetooth_com';
+        }
+      }
+    };
+
+    if (prnSelect) prnSelect.addEventListener('change', handlePrinterChange);
+    if (prnIfaceSelect) prnIfaceSelect.addEventListener('change', handlePrinterChange);
+
     // Copy Raw .env
     const btnCopyEnv = document.getElementById('btn-copy-raw-env');
     if (btnCopyEnv) {
@@ -1344,14 +1369,14 @@ class AdminApp {
     if (prnName && (env.PRINTER_NAME || this.settings.printerName)) {
       prnName.value = env.PRINTER_NAME || this.settings.printerName;
     }
-    if (prnInterface) prnInterface.value = env.PRINTER_INTERFACE || 'direct_usb';
-    if (prnIp) prnIp.value = env.PRINTER_IP || '192.168.1.200:9100';
-    if (prnWidth) prnWidth.value = env.PAPER_WIDTH || '80mm';
+    if (prnInterface) prnInterface.value = env.PRINTER_INTERFACE || 'bluetooth_com';
+    if (prnIp) prnIp.value = env.PRINTER_IP || 'COM6';
+    if (prnWidth) prnWidth.value = env.PAPER_WIDTH || '58mm';
     if (prnDensity) {
       prnDensity.value = env.PRINT_DENSITY || 8;
       if (prnDensityVal) prnDensityVal.textContent = `LEVEL ${prnDensity.value}`;
     }
-    if (prnAutoCut) prnAutoCut.checked = env.AUTO_CUT !== 'false';
+    if (prnAutoCut) prnAutoCut.checked = env.AUTO_CUT === 'true';
   }
 
   collectConfigForm() {

@@ -12,21 +12,25 @@ const net = require('net');
 const PS_HELPER_PATH = path.join(__dirname, 'print_helper.ps1');
 
 /**
- * Check if the thermal printer USB hardware is physically connected & powered on
+ * Check if the thermal printer (Bluetooth or USB) hardware is physically connected & powered on
  */
 function checkPrinterHardwareStatus() {
   return new Promise((resolve) => {
     const psScript = `
       $dev = Get-PnpDevice | Where-Object {
         $_.Present -eq $true -and (
+          $_.FriendlyName -like '*RPP*' -or
+          $_.FriendlyName -like '*POS*' -or
+          $_.InstanceId -like '*060384D4AE44*' -or
+          $_.InstanceId -like '*COM6*' -or
           $_.InstanceId -like '*0FE6*' -or
           $_.InstanceId -like '*USBPRINT*UNKNOWNPRINTER*' -or
           $_.InstanceId -like '*USB004*' -or
-          ($_.Class -eq 'Printer' -and $_.FriendlyName -notlike '*PDF*' -and $_.FriendlyName -notlike '*XPS*' -and $_.FriendlyName -notlike '*Root*')
+          ($_.Class -eq 'Printer' -and $_.FriendlyName -notlike '*PDF*' -and $_.FriendlyName -notlike '*XPS*' -and $_.FriendlyName -notlike '*Root*' -and $_.FriendlyName -notlike '*Canon*')
         )
       } | Select-Object -First 1 FriendlyName, InstanceId, Status
       if ($dev) {
-        @{ present = $true; friendlyName = $dev.FriendlyName; instanceId = $dev.InstanceId } | ConvertTo-Json -Compress
+        @{ present = $true; friendlyName = $dev.FriendlyName; instanceId = $dev.InstanceId; isBluetooth = ($dev.FriendlyName -like '*RPP*' -or $dev.InstanceId -like '*060384D4AE44*' -or $dev.InstanceId -like '*COM6*') } | ConvertTo-Json -Compress
       } else {
         @{ present = $false } | ConvertTo-Json -Compress
       }
@@ -51,13 +55,30 @@ function checkPrinterHardwareStatus() {
  */
 function getInstalledPrinters() {
   return new Promise((resolve) => {
-    const psScript = `Get-CimInstance Win32_Printer | Select-Object Name, Default, PortName | ConvertTo-Json -Compress`;
+    const psScript = `
+      $list = @()
+      $bt = Get-PnpDevice -ErrorAction SilentlyContinue | Where-Object { $_.Present -eq $true -and ($_.FriendlyName -like '*RPP*' -or $_.InstanceId -like '*060384D4AE44*' -or $_.InstanceId -like '*COM6*') } | Select-Object -First 1
+      if ($bt) {
+        $list += @{ Name = "RPP02N (Bluetooth COM6)"; Default = $true; PortName = "COM6"; IsBluetooth = $true }
+      }
+      $printers = Get-CimInstance Win32_Printer -ErrorAction SilentlyContinue | Select-Object Name, Default, PortName
+      if ($printers) {
+        foreach ($p in $printers) {
+          $list += @{ Name = $p.Name; Default = [bool]$p.Default; PortName = $p.PortName; IsBluetooth = ($p.PortName -like '*COM*') }
+        }
+      }
+      if ($list.Count -eq 0) {
+        $list += @{ Name = "RPP02N (Bluetooth COM6)"; Default = $true; PortName = "COM6"; IsBluetooth = $true }
+      }
+      $list | ConvertTo-Json -Compress
+    `;
 
     execFile('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', psScript], { timeout: 8000 }, (err, stdout) => {
       if (err || !stdout.trim()) {
         console.warn('[PRINTER] Failed to query printers via CIM, using fallback.');
         return resolve([
-          { name: 'Thermal Printer', isDefault: true }
+          { name: 'RPP02N (Bluetooth COM6)', isDefault: true, port: 'COM6', isBluetooth: true },
+          { name: 'Thermal Printer', isDefault: false, port: 'COM6:' }
         ]);
       }
 
@@ -67,12 +88,16 @@ function getInstalledPrinters() {
         const result = list.map(p => ({
           name: p.Name,
           isDefault: Boolean(p.Default),
-          port: p.PortName
+          port: p.PortName,
+          isBluetooth: Boolean(p.IsBluetooth)
         }));
         resolve(result);
       } catch (parseErr) {
         console.warn('[PRINTER] Error parsing printer list JSON:', parseErr.message);
-        resolve([{ name: 'Thermal Printer', isDefault: true }]);
+        resolve([
+          { name: 'RPP02N (Bluetooth COM6)', isDefault: true, port: 'COM6', isBluetooth: true },
+          { name: 'Thermal Printer', isDefault: false, port: 'COM6:' }
+        ]);
       }
     });
   });
@@ -88,23 +113,22 @@ async function printImageSilent(imagePath, options = {}) {
     throw new Error(`Receipt image file not found: ${imagePath}`);
   }
 
-  const printerName = options.printerName || 'Thermal Printer';
+  const printerName = options.printerName || 'RPP02N (Bluetooth COM6)';
 
-  // Check hardware connection if targeting Thermal Printer
-  if (printerName.toLowerCase().includes('thermal') || !options.printerName) {
-    const hw = await checkPrinterHardwareStatus();
-    if (!hw.present) {
-      console.warn(`[PRINTER] Thermal Printer is NOT physically present on USB! (Power OFF or USB unplugged)`);
-      return {
-        success: false,
-        hardwareOffline: true,
-        error: 'Printer Thermal belum terdeteksi aktif di USB! Pastikan kabel USB terpasang kuat ke PC dan tombol power printer dinyalakan (ON).',
-        printerName
-      };
-    }
+  // Check hardware connection if targeting Thermal / Bluetooth Printer
+  const hw = await checkPrinterHardwareStatus();
+  if (!hw.present && (printerName.toLowerCase().includes('thermal') || printerName.includes('RPP') || !options.printerName)) {
+    console.warn(`[PRINTER] Thermal / Bluetooth Printer is NOT physically present or paired!`);
+    return {
+      success: false,
+      hardwareOffline: true,
+      error: 'Printer Thermal belum terdeteksi aktif (Bluetooth / USB)! Pastikan printer Bluetooth RPP02N dinyalakan (ON) dan terhubung via Bluetooth (COM6).',
+      printerName
+    };
   }
 
   return new Promise((resolve) => {
+    const isBluetooth = hw.isBluetooth || printerName.includes('RPP') || printerName.includes('COM') || printerName.includes('Bluetooth');
     const args = [
       '-NoProfile',
       '-ExecutionPolicy',
@@ -117,7 +141,17 @@ async function printImageSilent(imagePath, options = {}) {
       printerName
     ];
 
-    console.log(`[PRINTER] Dispatching silent thermal print job for: ${path.basename(imagePath)} (Target Printer: ${printerName})`);
+    if (options.paperWidth) {
+      args.push('-PaperWidth', options.paperWidth);
+    } else if (isBluetooth) {
+      args.push('-PaperWidth', '58mm');
+    }
+
+    if (options.autoCut === false || isBluetooth) {
+      args.push('-NoCut');
+    }
+
+    console.log(`[PRINTER] Dispatching silent print job for: ${path.basename(imagePath)} (Target: ${printerName}, BT: ${isBluetooth})`);
 
     execFile('powershell.exe', args, { timeout: 15000 }, (error, stdout, stderr) => {
       if (error) {
@@ -140,27 +174,26 @@ async function printImageSilent(imagePath, options = {}) {
 }
 
 /**
- * Print a test strip receipt to verify USB thermal printer feed and cut
- * @param {object} options - Options: printerName
+ * Print a test strip receipt to verify Bluetooth/USB thermal printer feed
+ * @param {object} options - Options: printerName, paperWidth, autoCut
  */
 async function printTestReceipt(options = {}) {
-  const printerName = options.printerName || 'Thermal Printer';
+  const printerName = options.printerName || 'RPP02N (Bluetooth COM6)';
 
-  // Check hardware connection if targeting thermal printer
-  if (printerName.toLowerCase().includes('thermal') || !options.printerName) {
-    const hw = await checkPrinterHardwareStatus();
-    if (!hw.present) {
-      console.warn(`[PRINTER] Thermal Printer is NOT physically present on USB! (Power OFF or USB unplugged)`);
-      return {
-        success: false,
-        hardwareOffline: true,
-        error: 'Printer Thermal belum terdeteksi aktif di USB! Pastikan kabel USB terpasang kuat ke PC dan tombol power printer dinyalakan (ON).',
-        printerName
-      };
-    }
+  // Check hardware connection if targeting thermal / bluetooth printer
+  const hw = await checkPrinterHardwareStatus();
+  if (!hw.present && (printerName.toLowerCase().includes('thermal') || printerName.includes('RPP') || !options.printerName)) {
+    console.warn(`[PRINTER] Thermal / Bluetooth Printer is NOT detected!`);
+    return {
+      success: false,
+      hardwareOffline: true,
+      error: 'Printer Thermal belum terdeteksi aktif (Bluetooth / USB)! Pastikan printer Bluetooth RPP02N dinyalakan (ON) dan terhubung via Bluetooth (COM6).',
+      printerName
+    };
   }
 
   return new Promise((resolve) => {
+    const isBluetooth = hw.isBluetooth || printerName.includes('RPP') || printerName.includes('COM') || printerName.includes('Bluetooth');
     const args = [
       '-NoProfile',
       '-ExecutionPolicy',
@@ -172,7 +205,17 @@ async function printTestReceipt(options = {}) {
       '-TestFeed'
     ];
 
-    console.log(`[PRINTER] Sending test receipt to: ${printerName}`);
+    if (options.paperWidth) {
+      args.push('-PaperWidth', options.paperWidth);
+    } else if (isBluetooth) {
+      args.push('-PaperWidth', '58mm');
+    }
+
+    if (options.autoCut === false || isBluetooth) {
+      args.push('-NoCut');
+    }
+
+    console.log(`[PRINTER] Sending test receipt to: ${printerName} (BT: ${isBluetooth})`);
 
     execFile('powershell.exe', args, { timeout: 10000 }, (error, stdout, stderr) => {
       if (error) {

@@ -339,9 +339,9 @@ app.post('/api/print', async (req, res) => {
     let targetPrinterName = 'Default';
     if (filePath) {
       const settings = readJson('settings.json', {});
-      targetPrinterName = settings.printerName || process.env.PRINTER_NAME || '';
+      targetPrinterName = settings.printerName || process.env.PRINTER_NAME || 'RPP02N (Bluetooth COM6)';
       directPrintTriggered = true;
-      printImageSilent(filePath, { printerName: targetPrinterName })
+      printImageSilent(filePath, { printerName: targetPrinterName, paperWidth: process.env.PAPER_WIDTH || '58mm' })
         .then(printRes => {
           console.log('[API-PRINT] Direct thermal print result:', printRes);
         })
@@ -704,16 +704,16 @@ app.post('/api/admin/env/test-r2', async (req, res) => {
 app.post('/api/admin/env/test-printer', async (req, res) => {
   const { printerName, paperWidth, density, autoCut } = req.body;
   const settings = readJson('settings.json', {});
-  const target = printerName || settings.printerName || process.env.PRINTER_NAME || 'Thermal Printer';
+  const target = printerName || settings.printerName || process.env.PRINTER_NAME || 'RPP02N (Bluetooth COM6)';
 
   console.log(`[TEST-PRINTER] Test command requested for printer: "${target}"`);
 
-  const result = await printTestReceipt({ printerName: target, paperWidth, autoCut });
+  const result = await printTestReceipt({ printerName: target, paperWidth: paperWidth || process.env.PAPER_WIDTH || '58mm', autoCut });
   return res.json({
     success: result.success,
     hardwareOffline: Boolean(result.hardwareOffline),
     message: result.success
-      ? `Test print strip berhasil dikirim ke printer: ${result.printerName}`
+      ? `Test print strip berhasil dikirim via Bluetooth ke printer: ${result.printerName}`
       : `Gagal mencetak: ${result.error}`,
     result
   });

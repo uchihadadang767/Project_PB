@@ -2,6 +2,8 @@ param(
     [Parameter(Mandatory=$false)]
     [string]$ImagePath = "",
     [string]$PrinterName = "",
+    [string]$PaperWidth = "80mm",
+    [switch]$NoCut,
     [switch]$TestFeed
 )
 
@@ -11,6 +13,44 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
+
+public class RawComPrinter {
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern SafeFileHandle CreateFile(
+        string lpFileName,
+        uint dwDesiredAccess,
+        uint dwShareMode,
+        IntPtr lpSecurityAttributes,
+        uint dwCreationDisposition,
+        uint dwFlagsAndAttributes,
+        IntPtr hTemplateFile
+    );
+
+    public static bool SendRawBytes(string portName, byte[] bytes) {
+        string fullPort = @"\\.\" + portName.TrimEnd(':');
+        uint access = 0x40000000; // GENERIC_WRITE
+        uint share = 0;
+        uint openExisting = 3;
+
+        SafeFileHandle handle = CreateFile(fullPort, access, share, IntPtr.Zero, openExisting, 0, IntPtr.Zero);
+        if (handle.IsInvalid) {
+            return false;
+        }
+
+        try {
+            using (FileStream fs = new FileStream(handle, FileAccess.Write)) {
+                fs.Write(bytes, 0, bytes.Length);
+                fs.Flush();
+            }
+            return true;
+        } catch {
+            return false;
+        } finally {
+            handle.Close();
+        }
+    }
+}
 
 public class RawThermalPrinter {
     [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
@@ -67,7 +107,7 @@ public class RawThermalPrinter {
         return false;
     }
 
-    public static byte[] GenerateTestTicket(string printerName) {
+    public static byte[] GenerateTestTicket(string printerName, bool isBluetooth, bool is58mm) {
         using (MemoryStream ms = new MemoryStream()) {
             // ESC @ (Init)
             ms.Write(new byte[] { 0x1B, 0x40 }, 0, 2);
@@ -79,22 +119,32 @@ public class RawThermalPrinter {
             ms.Write(title, 0, title.Length);
             // Normal ESC ! 0x00
             ms.Write(new byte[] { 0x1B, 0x21, 0x00 }, 0, 3);
-            byte[] sub = Encoding.ASCII.GetBytes("--- THERMAL PRINTER TEST ---\n\n");
+            string subText = isBluetooth ? "--- BLUETOOTH WIRELESS TEST ---\n\n" : "--- THERMAL PRINTER TEST ---\n\n";
+            byte[] sub = Encoding.ASCII.GetBytes(subText);
             ms.Write(sub, 0, sub.Length);
             // ESC a 0 (Left align)
             ms.Write(new byte[] { 0x1B, 0x61, 0x00 }, 0, 3);
-            string body = "Status  : HARDWARE ONLINE [OK]\nPrinter : " + printerName + "\nDate    : " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\nCutter  : TEST SUCCESS\n\n================================\n\n";
+            string conn = isBluetooth ? "BLUETOOTH WIRELESS (COM6)" : "USB CABLE (DIRECT)";
+            string paper = is58mm ? "58MM (384 Dots)" : "80MM (576 Dots)";
+            string body = "Status  : ONLINE & CONNECTED [OK]\nLink    : " + conn + "\nPrinter : " + printerName + "\nPaper   : " + paper + "\nDate    : " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "\n\n================================\n";
             byte[] bodyBytes = Encoding.ASCII.GetBytes(body);
             ms.Write(bodyBytes, 0, bodyBytes.Length);
-            // Feed 4 lines (ESC d 4)
+            
+            // Feed lines
             ms.Write(new byte[] { 0x1B, 0x64, 0x04 }, 0, 3);
-            // Cut (GS V 0)
-            ms.Write(new byte[] { 0x1D, 0x56, 0x00 }, 0, 3);
+
+            if (!is58mm && !isBluetooth) {
+                // Cut (GS V 0) for 80mm cutters
+                ms.Write(new byte[] { 0x1D, 0x56, 0x00 }, 0, 3);
+            } else {
+                // Extra feed so manual tear bar clears
+                ms.Write(new byte[] { 0x1B, 0x64, 0x02 }, 0, 3);
+            }
             return ms.ToArray();
         }
     }
 
-    public static byte[] ConvertImageToEscPos(string imagePath, int targetWidth) {
+    public static byte[] ConvertImageToEscPos(string imagePath, int targetWidth, bool autoCut) {
         using (Bitmap src = new Bitmap(imagePath)) {
             int width = targetWidth;
             int height = (int)((float)src.Height * targetWidth / src.Width);
@@ -138,8 +188,13 @@ public class RawThermalPrinter {
                     // Feed 4 lines
                     ms.Write(new byte[] { 0x1B, 0x64, 0x04 }, 0, 3);
 
-                    // Cut paper (GS V 0)
-                    ms.Write(new byte[] { 0x1D, 0x56, 0x00 }, 0, 3);
+                    if (autoCut) {
+                        // Cut paper (GS V 0)
+                        ms.Write(new byte[] { 0x1D, 0x56, 0x00 }, 0, 3);
+                    } else {
+                        // Extra feed for manual tear bar
+                        ms.Write(new byte[] { 0x1B, 0x64, 0x03 }, 0, 3);
+                    }
 
                     return ms.ToArray();
                 }
@@ -151,14 +206,10 @@ public class RawThermalPrinter {
 
 try {
     Add-Type -AssemblyName System.Drawing
-    if (-not ([System.Management.Automation.PSTypeName]'RawThermalPrinter').Type) {
+    if (-not ([System.Management.Automation.PSTypeName]'RawComPrinter').Type) {
         Add-Type -TypeDefinition $code -ReferencedAssemblies System.Drawing
     }
 
-    # Target printer priority:
-    # 1. Parameter PrinterName if given and valid
-    # 2. 'Thermal Printer' (created on USB004) if exists
-    # 3. Default printer
     $targetPrinter = $PrinterName
     $installed = [System.Drawing.Printing.PrinterSettings]::InstalledPrinters
 
@@ -170,11 +221,50 @@ try {
         }
     }
 
-    Write-Host "[PRINT-HELPER] Target Printer: $targetPrinter"
+    $isBluetooth = ($targetPrinter -like '*RPP*' -or $targetPrinter -like '*COM*' -or $targetPrinter -eq 'COM6' -or $targetPrinter -like '*Bluetooth*')
+    $comPort = "COM6"
+    if ($targetPrinter -match '(COM\d+)') {
+        $comPort = $matches[1]
+    }
 
-    # If TestFeed requested, send test ticket immediately
+    if (-not $isBluetooth) {
+        try {
+            $pObj = Get-CimInstance Win32_Printer -Filter "Name='$targetPrinter'" -ErrorAction SilentlyContinue
+            if ($pObj -and $pObj.PortName -match '(COM\d+)') {
+                $isBluetooth = $true
+                $comPort = $matches[1]
+            }
+        } catch {}
+    }
+
+    if (-not $isBluetooth) {
+        $btDev = Get-PnpDevice -ErrorAction SilentlyContinue | Where-Object { $_.Present -eq $true -and ($_.FriendlyName -like '*RPP*' -or $_.InstanceId -like '*060384D4AE44*') } | Select-Object -First 1
+        if ($btDev) {
+            $isBluetooth = $true
+            $comPort = "COM6"
+        }
+    }
+
+    $is58mm = ($PaperWidth -like '*58*' -or $isBluetooth -or $targetPrinter -like '*RPP*')
+    $targetDots = 576
+    $autoCut = (-not $NoCut)
+    if ($is58mm) {
+        $targetDots = 384
+        $autoCut = $false
+    }
+
+    Write-Host "[PRINT-HELPER] Target Printer: $targetPrinter (Bluetooth: $isBluetooth, Port: $comPort, Width: $targetDots dots)"
+
+    # If TestFeed requested, send test ticket
     if ($TestFeed) {
-        $testBytes = [RawThermalPrinter]::GenerateTestTicket($targetPrinter)
+        $testBytes = [RawThermalPrinter]::GenerateTestTicket($targetPrinter, $isBluetooth, $is58mm)
+        if ($isBluetooth) {
+            $comSuccess = [RawComPrinter]::SendRawBytes($comPort, $testBytes)
+            if ($comSuccess) {
+                Write-Output "SUCCESS_TEST: Bluetooth test ticket printed to $comPort ($targetPrinter)"
+                exit 0
+            }
+        }
         $rawSuccess = [RawThermalPrinter]::SendRawBytes($targetPrinter, $testBytes)
         if ($rawSuccess) {
             Write-Output "SUCCESS_TEST: Test ticket printed to $targetPrinter"
@@ -192,21 +282,27 @@ try {
 
     $resolvedPath = (Resolve-Path $ImagePath).Path
 
-    # Step 1: Attempt direct RAW ESC/POS printing (Fastest, zero margin, direct head raster)
+    # Step 1: Attempt direct ESC/POS printing (COM Port for Bluetooth, Winspool for USB)
     try {
-        $escposBytes = [RawThermalPrinter]::ConvertImageToEscPos($resolvedPath, 576)
+        $escposBytes = [RawThermalPrinter]::ConvertImageToEscPos($resolvedPath, $targetDots, $autoCut)
+        if ($isBluetooth) {
+            $comSuccess = [RawComPrinter]::SendRawBytes($comPort, $escposBytes)
+            if ($comSuccess) {
+                Write-Output "SUCCESS_BLUETOOTH: Printed ESC/POS bitmap wirelessly to $comPort ($targetPrinter)"
+                exit 0
+            }
+        }
+
         $rawSuccess = [RawThermalPrinter]::SendRawBytes($targetPrinter, $escposBytes)
         if ($rawSuccess) {
             Write-Output "SUCCESS_RAW: Printed ESC/POS bitmap to $targetPrinter"
             exit 0
-        } else {
-            Write-Warning "RAW print spooling returned false, trying GDI PrintDocument fallback..."
         }
     } catch {
-        Write-Warning "RAW ESC/POS error: $($_.Exception.Message). Falling back to GDI..."
+        Write-Warning "RAW error: $($_.Exception.Message). Falling back to GDI..."
     }
 
-    # Step 2: Fallback to GDI PrintDocument (for standard inkjet/laser/virtual printer)
+    # Step 2: Fallback to GDI PrintDocument
     $doc = New-Object System.Drawing.Printing.PrintDocument
     $doc.PrinterSettings.PrinterName = $targetPrinter
     $doc.DefaultPageSettings.Margins = New-Object System.Drawing.Printing.Margins(0, 0, 0, 0)

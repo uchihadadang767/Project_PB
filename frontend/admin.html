@@ -847,13 +847,13 @@
         <div id="cfg-tab-printer" class="cfg-tab-content space-y-4 hidden">
           <div id="printer-cloud-warning" class="hidden p-3.5 rounded-lg bg-emerald-50 border-2 border-black shadow-[2px_2px_0px_#000] text-black text-xs font-mono">
             <div class="flex items-center gap-2 font-bold text-emerald-900 mb-1">
-              <span class="material-symbols-outlined text-[18px] text-emerald-600">cloud_sync</span>
-              <span>VERCEL CLOUD TERHUBUNG KE PRINTER USB LOKAL</span>
+              <span class="material-symbols-outlined text-[18px] text-emerald-600">bluetooth</span>
+              <span>VERCEL CLOUD TERHUBUNG KE PRINTER BLUETOOTH / USB</span>
             </div>
             <p class="text-gray-800 leading-relaxed">
-              Kiosk Vercel terhubung ke USB Printer laptop Anda via bridge:
-              <span id="bridge-url-display" class="font-bold text-emerald-700 bg-white px-2 py-0.5 border border-black rounded">https://f4c6400aa43f92.lhr.life</span>.
-              Perintah cetak dari Vercel otomatis diteruskan langsung ke printer thermal fisik tanpa popup!
+              Kiosk Vercel terhubung ke printer Bluetooth (RPP02N / COM6) atau USB laptop Anda via bridge:
+              <span id="bridge-url-display" class="font-bold text-emerald-700 bg-white px-2 py-0.5 border border-black rounded">https://frankfurt-commerce-project-charles.trycloudflare.com</span>.
+              Perintah cetak dari Vercel otomatis diteruskan nirkabel via Bluetooth ke printer thermal tanpa popup!
             </p>
           </div>
 
@@ -868,7 +868,8 @@
             <div>
               <label class="block text-black mb-1.5 font-bold">INTERFACE PRINTER</label>
               <select id="cfg-printer-interface" class="w-full px-3.5 py-2.5 rounded-lg bg-white border-2 border-black text-black font-bold focus:outline-none focus:ring-2 focus:ring-[#ffb703] transition-colors">
-                <option value="direct_usb">WINDOWS SPOOLER / USB (Direkomendasikan)</option>
+                <option value="bluetooth_com">BLUETOOTH WIRELESS (COM6 / RPP02N - Direkomendasikan)</option>
+                <option value="direct_usb">WINDOWS SPOOLER / USB</option>
                 <option value="network_tcp">NETWORK LAN / TCP (IP Socket Port 9100)</option>
               </select>
             </div>
