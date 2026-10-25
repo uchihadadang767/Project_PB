@@ -3,7 +3,7 @@
  * Manages Clean 5-Button Home Dashboard, Dedicated Sub-Pages, Orders ACC, QR Payment, Frame Geometry, Photo Styles, and Archives
  */
 
-const DEFAULT_BRIDGE_URL = 'https://costume-bicycle-carnival-submitted.trycloudflare.com';
+const DEFAULT_BRIDGE_URL = 'https://f4c6400aa43f92.lhr.life';
 
 function resolveApiBase() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
